@@ -1,0 +1,55 @@
+services:
+  st-mysql:
+    image: mysql:8.0.30
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    env_file:
+      - .env
+    volumes:
+      - './docker/data/db:/var/lib/mysql'
+      - './docker/configs/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf'
+    command: --default-authentication-plugin=mysql_native_password
+
+  st-apache:
+    image: 3axapp/psk-php:7.2-apache-dev.0.1.0
+    ports:
+      - 8080:80
+    volumes:
+      - ./backend/:/var/www/student
+      - ./docker/configs/apache2/default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./docker/configs/php/php.ini:/usr/local/etc/php/php.ini
+    networks:
+      - default
+      - lms_network
+
+  frontend:
+    image: node:22.19.0-alpine
+    env_file:
+      - .env
+    ports:
+      - 4200:4200
+    working_dir: /app
+    user: $UID
+    volumes:
+      - ./frontend:/app
+    command: npm start -- --host 0.0.0.0
+
+  migrations:
+    image: 3axapp/psk-php:8.4-cli.0.0.0.0
+    user: $UID
+    profiles:
+      - migrations
+    env_file:
+      - .env
+    environment:
+      - MIGRATION_ACTION=up
+    volumes:
+      - ./backend/tools/migrations:/app
+    working_dir: /app
+    command: php ./vendor/bin/yii-db-migration migrate:${MIGRATION_ACTION} -n
+
+networks:
+  lms_network:
+    external: true

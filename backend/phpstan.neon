@@ -1,0 +1,11 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - vendor
+    universalObjectCratesClasses:
+        - Ox3a\Common\View\HtmlView
+includes:
+    - dev-tools/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/0x3a/student-common/phpstan.extensions.neon

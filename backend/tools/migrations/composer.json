@@ -1,0 +1,12 @@
+{
+  "config": {
+    "platform": {
+      "php": "8.4"
+    }
+  },
+  "require": {
+    "yiisoft/db-migration": "^1.2",
+    "yiisoft/db-mysql": "^1.2",
+    "yiisoft/cache": "^3.1"
+  }
+}

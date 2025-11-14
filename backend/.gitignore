@@ -1,0 +1,6 @@
+vendor
+/dev-tools/vendor
+/.idea
+/auth.json
+/compose.override.yml
+/compose.override.yaml

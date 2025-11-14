@@ -1,0 +1,17 @@
+[mysqld]
+#user		= mysql
+#key_buffer_size		= 16M
+#myisam-recover-options  = BACKUP
+##log_error = /var/log/mysql/error.log
+##default-time-zone="Europe/Moscow"
+#default-time-zone="+03:00"
+#max_binlog_size   = 100M
+#collation-server = utf8_general_ci
+#character-set-server = utf8mb3
+default_authentication_plugin = mysql_native_password
+#event-scheduler = ON
+
+sql-mode = "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
+
+skip-name-resolve=1
+bind-address=0.0.0.0
