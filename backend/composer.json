@@ -23,7 +23,11 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "PskDev\\": "vendor/0x3a/student-common/dev/"
+            "PskDev\\": "vendor/0x3a/student-common/dev/",
+            "Psk\\MessengerModule\\": [
+                "src-dev/",
+                "tests"
+            ]
         }
     },
     "require": {
@@ -33,7 +37,8 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "0x3a/student-annotation": "^2.13.1"
+        "0x3a/student-annotation": "^2.13.1",
+        "phpunit/phpunit": "^8"
     },
     "scripts": {
         "install-tools": "@composer --working-dir=dev-tools install",

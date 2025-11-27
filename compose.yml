@@ -50,6 +50,18 @@ services:
     working_dir: /app
     command: php ./vendor/bin/yii-db-migration migrate:${MIGRATION_ACTION} -n
 
+  migrator:
+    image: 3axapp/psk-php:8.4-cli.0.0.0.0
+    user: $UID
+    profiles:
+      - migrator
+    env_file:
+      - .env
+    volumes:
+      - ./backend/tools/migrations:/app
+    working_dir: /app
+    command: php ./vendor/bin/yii-db-migration migrate:${MIGRATION_ACTION} -n
+
 networks:
   lms_network:
     external: true

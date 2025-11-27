@@ -8,9 +8,9 @@ use Yiisoft\Db\Migration\MigrationBuilder;
 use Yiisoft\Db\Migration\RevertibleMigrationInterface;
 
 /**
- * Class M251030082629CreateFiles
+ * Class M251029130137CreateFiles
  */
-final class M251030082629CreateFiles implements RevertibleMigrationInterface
+final class M251029130137CreateFiles implements RevertibleMigrationInterface
 {
     /**
      * @throws InvalidConfigException
