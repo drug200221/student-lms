@@ -40,6 +40,7 @@ class CourseConditions
      *          description?: Conditions\StringCondition,
      *          baseId?: Conditions\IntCondition,
      *          type?: Conditions\IntCondition,
+     *          createdAt?: Conditions\DateTimeCondition,
      *          fillProgress?: Conditions\IntCondition,
      *      }
      */
@@ -57,7 +58,7 @@ class CourseConditions
     public function getId()
     {
         if (!isset($this->conditions['id'])) {
-            $this->conditions["id"] = new Conditions\IntCondition("lms_courses.id");
+            $this->conditions["id"] = new Conditions\IntCondition("crs.id");
         }
         return $this->conditions['id'];
     }
@@ -82,7 +83,7 @@ class CourseConditions
     public function getTitle()
     {
         if (!isset($this->conditions['title'])) {
-            $this->conditions["title"] = new Conditions\StringCondition("lms_courses.title");
+            $this->conditions["title"] = new Conditions\StringCondition("crs.title");
         }
         return $this->conditions['title'];
     }
@@ -107,7 +108,7 @@ class CourseConditions
     public function getDescription()
     {
         if (!isset($this->conditions['description'])) {
-            $this->conditions["description"] = new Conditions\StringCondition("lms_courses.description");
+            $this->conditions["description"] = new Conditions\StringCondition("crs.description");
         }
         return $this->conditions['description'];
     }
@@ -132,7 +133,7 @@ class CourseConditions
     public function getBaseId()
     {
         if (!isset($this->conditions['baseId'])) {
-            $this->conditions["baseId"] = new Conditions\IntCondition("lms_courses.base_id");
+            $this->conditions["baseId"] = new Conditions\IntCondition("crs.base_id");
         }
         return $this->conditions['baseId'];
     }
@@ -157,7 +158,7 @@ class CourseConditions
     public function getType()
     {
         if (!isset($this->conditions['type'])) {
-            $this->conditions["type"] = new Conditions\IntCondition("lms_courses.type");
+            $this->conditions["type"] = new Conditions\IntCondition("crs.type");
         }
         return $this->conditions['type'];
     }
@@ -177,12 +178,37 @@ class CourseConditions
     }
 
     /**
+     * @return Conditions\DateTimeCondition
+     */
+    public function getCreatedAt()
+    {
+        if (!isset($this->conditions['createdAt'])) {
+            $this->conditions["createdAt"] = new Conditions\DateTimeCondition("crs.created_at");
+        }
+        return $this->conditions['createdAt'];
+    }
+
+    /**
+     * @param non-empty-string $direction
+     * @return $this
+     */
+    public function orderByCreatedAt($direction = 'asc')
+    {
+        if ($direction) {
+            $this->order["createdAt"] = $direction;
+        } else {
+            unset($this->order["createdAt"]);
+        }
+        return $this;
+    }
+
+    /**
      * @return Conditions\IntCondition
      */
     public function getFillProgress()
     {
         if (!isset($this->conditions['fillProgress'])) {
-            $this->conditions["fillProgress"] = new Conditions\IntCondition("lms_courses.fill_progress");
+            $this->conditions["fillProgress"] = new Conditions\IntCondition("crs.fill_progress");
         }
         return $this->conditions['fillProgress'];
     }

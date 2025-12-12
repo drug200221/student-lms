@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Psk\LmsModule\Services\REST\Admin;
 
-use Psk\LmsModule\Forms\Requests\Course\AddCourseFormModel;
+use Psk\LmsModule\Forms\Requests\CourseFormModel;
 use Psk\LmsModule\Models\CourseModel;
-use Psk\LmsModule\Repository\CourseRepository;
+use Psk\LmsModule\Repositories\CourseRepository;
 use Psk\RestModule\RestServiceInterface;
 use Psk\RestModule\Results\AbstractResult;
 use Psk\RestModule\Results\InternalServerErrorResult;
@@ -12,10 +14,13 @@ use Psk\RestModule\Results\NotFoundResult;
 use Psk\RestModule\Results\SuccessResult;
 use Psk\RestModule\Results\ValidationErrorsResult;
 
-class CourseService implements RestServiceInterface
+/**
+ * @internal
+ */
+final class CourseService implements RestServiceInterface
 {
-    /** @var AddCourseFormModel */
-    private $addCourseForm;
+    /** @var CourseFormModel|null */
+    private $courseForm;
 
     /** @var CourseRepository */
     private $courseRepository;
@@ -26,31 +31,43 @@ class CourseService implements RestServiceInterface
     }
 
     /**
-     * @inheritDoc
+     * @param array<string,mixed> $params
+     * @return SuccessResult
      */
-    public function find($params)
+    public function find($params): SuccessResult
     {
-        // TODO: Implement find() method.
+        if (isset($params['course-ids'])) {
+            $courseIds = explode(',', $params['course-ids']);
+            return new SuccessResult($this->courseRepository->findByIds($courseIds));
+        }
+        if (isset($params['base-id'], $params['type'])) {
+            return new SuccessResult($this->courseRepository->findByTitleAndBaseIdAndType(null, (int)$params['base-id'], (int)$params['type']));
+        }
+
+        return new SuccessResult($this->courseRepository->getAll());
     }
 
     /**
-     * @inheritDoc
+     * @param positive-int $id
+     * @return NotFoundResult|SuccessResult
+     * @throws \ReflectionException
      */
-    public function get($id)
+    public function get($id): AbstractResult
     {
-        $course = $this->courseRepository->findById($id);
+        $id = (int)$id;
+        $course = $this->courseRepository->findById($id, true);
 
         return $course ? new SuccessResult($course) : new NotFoundResult();
     }
 
     /**
-     * @param $data
+     * @param array<string,mixed> $data
      * @return AbstractResult
      * @throws \ReflectionException
      */
-    public function create($data)
+    public function create($data): AbstractResult
     {
-        $form = $this->getAddCourseForm();
+        $form = $this->getForm();
         if (!$form->setData($data)->isValid()) {
             return new ValidationErrorsResult($form->getMessages());
         }
@@ -68,7 +85,7 @@ class CourseService implements RestServiceInterface
                 ->setTitle($request->title)
                 ->setBaseId($request->baseId)
                 ->setType($request->type)
-                ->setFillProgress(0);
+                ->setCreatedAt(new \DateTimeImmutable());
 
             $this->courseRepository->save($course);
         }
@@ -83,26 +100,30 @@ class CourseService implements RestServiceInterface
     }
 
     /**
-     * @inheritDoc
+     * @param positive-int $id
+     * @param array<string,mixed> $data
+     * @return AbstractResult
      */
-    public function update($id, $data)
+    public function update($id, $data): AbstractResult
     {
-        // TODO: Implement update() method.
+        $id = (int)$id;
+        return new InternalServerErrorResult("Not implemented yet.");
     }
 
     /**
-     * @inheritDoc
+     * @param positive-int $id
+     * @return AbstractResult
      */
-    public function delete($id)
+    public function delete($id): AbstractResult
     {
-        // TODO: Implement delete() method.
+        return new InternalServerErrorResult("Not implemented yet.");
     }
 
     /**
-     * @return AddCourseFormModel
+     * @return CourseFormModel
      */
-    private function getAddCourseForm(): AddCourseFormModel
+    private function getForm(): CourseFormModel
     {
-        return $this->addCourseForm ?: ($this->addCourseForm = new AddCourseFormModel());
+        return $this->courseForm ?: ($this->courseForm = new CourseFormModel());
     }
 }

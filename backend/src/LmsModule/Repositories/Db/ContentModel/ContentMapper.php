@@ -4,25 +4,24 @@
  * auto generated
  */
 
-namespace Psk\LmsModule\Repositories\Db\CourseModel;
+namespace Psk\LmsModule\Repositories\Db\ContentModel;
 
 use Ox3a\Core\ConditionsBuilder\ConditionsBuilder;
 use Ox3a\Service\DbServiceInterface;
-use Psk\LmsModule\Models\CourseModel;
+use Psk\LmsModule\Models\ContentModel;
 use ReflectionException;
 use Zend\Db\Sql\Platform\Platform;
-use Zend\Db\Sql\Predicate\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 /**
- * Class CourseMapper
- * @package Psk\LmsModule\Repositories\Db\CourseModel
+ * Class ContentMapper
+ * @package Psk\LmsModule\Repositories\Db\ContentModel
  */
-class CourseMapper
+class ContentMapper
 {
     /** @var non-empty-string */
-    private $table = 'lms_courses';
+    private $table = 'lms_contents';
 
     /** @var non-empty-string */
     private $primaryKey = 'id';
@@ -45,11 +44,11 @@ class CourseMapper
 
     /**
      * Сохранить
-     * @param CourseModel $entity
+     * @param ContentModel $entity
      * @return void
      * @throws ReflectionException
      */
-    public function save(CourseModel $entity)
+    public function save(ContentModel $entity)
     {
         $hydrator = $this->getHydrator();
         $data     = $hydrator->extract($entity);
@@ -67,10 +66,10 @@ class CourseMapper
 
     /**
      * Найти сущности по условиям
-     * @param CourseConditions $conditions
-     * @return list<CourseModel>
+     * @param ContentConditions $conditions
+     * @return list<ContentModel>
      */
-    public function findBy(CourseConditions $conditions)
+    public function findBy(ContentConditions $conditions)
     {
         $select = $this->getSelect();
 
@@ -117,17 +116,24 @@ class CourseMapper
 
         return $select
             ->from(
-                ['crs' => $this->table]
+                ['cnts' => $this->table]
             )
             ->columns(
                 [
                     'id' => "id",
+                    'courseId' => "course_id",
                     'title' => "title",
-                    'description' => "description",
-                    'baseId' => "base_id",
-                    'type' => "type",
+                    'content' => "content",
+                    'path' => "path",
+                    'parentId' => "parent_id",
                     'createdAt' => "created_at",
-                    'fillProgress' => "fill_progress",
+                    'updatedAt' => "updated_at",
+                    'revision' => "revision",
+                    'type' => "type",
+                    'treeLevel' => "tree_level",
+                    'treeLeft' => "tree_left",
+                    'treeRight' => "tree_right",
+                    'treeOrder' => "tree_order",
                 ]
             );
     }
@@ -135,11 +141,11 @@ class CourseMapper
     /**
      * Создать сущность
      * @param array<non-empty-string, mixed> $data
-     * @return CourseModel
+     * @return ContentModel
      */
     public function createEntity($data = [])
     {
-        $entity = new CourseModel();
+        $entity = new ContentModel();
 
         $this->getHydrator()->hydrate($entity, $data);
 
@@ -166,11 +172,11 @@ class CourseMapper
 
     /**
      * Получить гидратор
-     * @return CourseHydrator
+     * @return ContentHydrator
      */
     protected function getHydrator()
     {
-        return new CourseHydrator();
+        return new ContentHydrator();
     }
 
     /**

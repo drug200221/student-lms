@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Psk\LmsModule\Models;
 
 use Ox3a\Annotation\Mapping;
 
 /**
+ * @internal
  * @Mapping\Table("lms_courses", alias="crs")
  */
-class CourseModel implements \JsonSerializable
+final class CourseModel implements \JsonSerializable
 {
     /**
      * @Mapping\Id()
@@ -45,17 +48,24 @@ class CourseModel implements \JsonSerializable
     private $type;
 
     /**
+     * @Mapping\Column("created_at", table="crs", type="DateTime")
+     * @var \DateTimeImmutable
+     */
+    private $createdAt;
+
+    /**
      * @Mapping\Column("fill_progress", table="crs", type="int")
      * @var int<0,100>
      */
-    private $fillProgress;
+    private $fillProgress = 0;
 
+    /** @var ContentModel[] */
     private $contents = [];
 
     /**
      * @return positive-int
      */
-    public function getId(): int
+    final public function getId(): int
     {
         return $this->id;
     }
@@ -63,16 +73,16 @@ class CourseModel implements \JsonSerializable
     /**
      * @return string
      */
-    public function getTitle(): string
+    final public function getTitle(): string
     {
         return $this->title;
     }
 
     /**
      * @param string $title
-     * @return CourseModel
+     * @return self
      */
-    public function setTitle(string $title): CourseModel
+    final public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -81,16 +91,16 @@ class CourseModel implements \JsonSerializable
     /**
      * @return string|null
      */
-    public function getDescription(): ?string
+    final public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
      * @param string|null $description
-     * @return CourseModel
+     * @return self
      */
-    public function setDescription(?string $description): CourseModel
+    final public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -99,16 +109,16 @@ class CourseModel implements \JsonSerializable
     /**
      * @return positive-int
      */
-    public function getBaseId(): int
+    final public function getBaseId(): int
     {
         return $this->baseId;
     }
 
     /**
      * @param positive-int $baseId
-     * @return CourseModel
+     * @return self
      */
-    public function setBaseId(int $baseId): CourseModel
+    final public function setBaseId(int $baseId): self
     {
         $this->baseId = $baseId;
         return $this;
@@ -117,40 +127,58 @@ class CourseModel implements \JsonSerializable
     /**
      * @return int<1|2|3>
      */
-    public function getType(): int
+    final public function getType(): int
     {
         return $this->type;
     }
 
     /**
      * @param int<1|2|3> $type
-     * @return CourseModel
+     * @return self
      */
-    public function setType(int $type): CourseModel
+    final public function setType(int $type): self
     {
         $this->type = $type;
         return $this;
     }
 
     /**
+     * @return \DateTimeImmutable
+     */
+    final public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTimeImmutable $createdAt
+     * @return self
+     */
+    final public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
      * @return int<0,100>
      */
-    public function getFillProgress(): int
+    final public function getFillProgress(): int
     {
         return $this->fillProgress;
     }
 
     /**
      * @param int<0,100> $fillProgress
-     * @return CourseModel
+     * @return self
      */
-    public function setFillProgress(int $fillProgress): CourseModel
+    final public function setFillProgress(int $fillProgress): self
     {
         $this->fillProgress = $fillProgress;
         return $this;
     }
 
-    public function jsonSerialize(): array
+    final public function jsonSerialize(): array
     {
         return [
             'id'           => $this->id,
@@ -158,6 +186,7 @@ class CourseModel implements \JsonSerializable
             'description'  => $this->description,
             'baseId'       => $this->baseId,
             'type'         => $this->type,
+            'createdAt'    => $this->createdAt,
             'fillProgress' => $this->fillProgress,
             'contents'     => $this->contents,
         ];

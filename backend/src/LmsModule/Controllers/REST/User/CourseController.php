@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Psk\LmsModule\Controllers\REST\Admin;
+namespace Psk\LmsModule\Controllers\REST\User;
 
 use Ox3a\Annotation\Route;
 use Ox3a\Common\Service\RequestService;
@@ -12,7 +12,7 @@ use Psk\RestModule\AbstractRestController;
 /**
  * @internal
  * TODO: ДОБАВИТЬ ПРОВЕРКУ ПРАВ И АВТОРИЗАЦИИ
- * @Route("/lms/api/v1/admin/courses", name="lms.Admin.Courses")
+ * @Route("/lms/api/v1/courses", name="lms.Courses")
  */
 final class CourseController extends AbstractRestController
 {

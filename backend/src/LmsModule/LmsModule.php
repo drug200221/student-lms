@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Psk\LmsModule;
 
 use Ox3a\Common\Module\ModuleInterface;
 use Ox3a\Common\StudentApplication;
 
-class LmsModule implements ModuleInterface
+final class LmsModule implements ModuleInterface
 {
     /**
      * @var string
@@ -17,28 +19,28 @@ class LmsModule implements ModuleInterface
      */
     private $app;
 
-    public function setApp(StudentApplication $app)
+    public function setApp(StudentApplication $app): void
     {
         $this->app = $app;
     }
 
-    public function getName()
+    public function getName(): string
     {
         $className = static::class;
         return substr($className, strrpos($className, '\\') + 1);
     }
 
-    public function getConfigDir()
+    public function getConfigDir(): string
     {
         return $this->path . '/configs';
     }
 
-    public function getResourceDir()
+    public function getResourceDir(): string
     {
         return $this->path . '/Resources';
     }
 
-    public function bootstrap()
+    public function bootstrap(): void
     {
     }
 }

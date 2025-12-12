@@ -4,25 +4,25 @@
  * auto generated
  */
 
-namespace Psk\LmsModule\Repositories\Db\CourseModel;
+namespace Psk\LmsModule\Repositories\Db\ContentModel;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use Psk\LmsModule\Models\CourseModel;
+use Psk\LmsModule\Models\ContentModel;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 
 /**
- * Class CourseHydrator
- * @package Psk\LmsModule\Repositories\Db\CourseModel
+ * Class ContentHydrator
+ * @package Psk\LmsModule\Repositories\Db\ContentModel
  */
-class CourseHydrator
+class ContentHydrator
 {
     /** @var array<non-empty-string, ReflectionProperty> */
     private static $propertyReflections = [];
 
-    /** @var ReflectionClass<CourseModel>|null */
+    /** @var ReflectionClass<ContentModel>|null */
     private static $classReflection;
 
     /**
@@ -31,12 +31,19 @@ class CourseHydrator
      */
     private $map = [
         'id' => ['id', 'int'],
+        'courseId' => ['course_id', 'int'],
         'title' => ['title', 'string'],
-        'description' => ['description', 'string'],
-        'baseId' => ['base_id', 'int'],
-        'type' => ['type', 'int'],
+        'content' => ['content', 'string'],
+        'path' => ['path', 'string'],
+        'parentId' => ['parent_id', 'int'],
         'createdAt' => ['created_at', 'DateTime'],
-        'fillProgress' => ['fill_progress', 'int'],
+        'updatedAt' => ['updated_at', 'DateTime'],
+        'revision' => ['revision', 'int'],
+        'type' => ['type', 'int'],
+        'treeLevel' => ['tree_level', 'int'],
+        'treeLeft' => ['tree_left', 'int'],
+        'treeRight' => ['tree_right', 'int'],
+        'treeOrder' => ['tree_order', 'int'],
     ];
 
     /**
@@ -59,20 +66,20 @@ class CourseHydrator
     }
 
     /**
-     * @return ReflectionClass<CourseModel>
+     * @return ReflectionClass<ContentModel>
      */
     private static function getReflectionClass()
     {
-        return self::$classReflection ?: self::$classReflection = new ReflectionClass(CourseModel::class);
+        return self::$classReflection ?: self::$classReflection = new ReflectionClass(ContentModel::class);
     }
 
     /**
      * Заполнить объект данными
-     * @param CourseModel $object
+     * @param ContentModel $object
      * @param array<non-empty-string, mixed> $data
-     * @return CourseModel
+     * @return ContentModel
      */
-    public function hydrate(CourseModel $object, array $data)
+    public function hydrate(ContentModel $object, array $data)
     {
         foreach ($this->map as $property => $settings) {
             if (array_key_exists($property, $data)) {
@@ -88,11 +95,11 @@ class CourseHydrator
 
     /**
      * Извлечь данные из объекта
-     * @param CourseModel $object
+     * @param ContentModel $object
      * @return array<non-empty-string, mixed>
      * @throws ReflectionException
      */
-    public function extract(CourseModel $object)
+    public function extract(ContentModel $object)
     {
         $dbData = [];
 
@@ -108,25 +115,25 @@ class CourseHydrator
 
     /**
      * Заполнить данными свойство объекта
-     * @param CourseModel $object
+     * @param ContentModel $object
      * @param non-empty-string $property
      * @param mixed $value
      * @return void
      * @throws ReflectionException
      */
-    public function hydrateProperty(CourseModel $object, $property, $value)
+    public function hydrateProperty(ContentModel $object, $property, $value)
     {
         self::getReflectionProperty($property)->setValue($object, $value);
     }
 
     /**
      * Извлечь данные из свойства объекта
-     * @param CourseModel $object
+     * @param ContentModel $object
      * @param non-empty-string $property
      * @return mixed
      * @throws ReflectionException
      */
-    public function extractProperty(CourseModel $object, $property)
+    public function extractProperty(ContentModel $object, $property)
     {
         return self::getReflectionProperty($property)->getValue($object);
     }
