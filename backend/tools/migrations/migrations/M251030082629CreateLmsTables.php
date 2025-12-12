@@ -38,12 +38,14 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'created_at' => 'DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Дата создания"',
             'updated_at' => 'DATETIME                NULL                           COMMENT "Дата изменения"',
             'revision'   => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Кол-во правок"',
-            'type'       => 'TINYINT(1) UNSIGNED NOT NULL DEFAULT 1                 COMMENT "Тип контента [1 - текст, 2 - папка, 3 - веб-ссылка] *используется ли???"',
+            'type'       => 'TINYINT(1) UNSIGNED NOT NULL DEFAULT 1                 COMMENT "1 - текст,\n2 - папка,\n3 - веб-ссылка\n*Используется ли???"',
             'tree_level' => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Уровень вложенности"',
             'tree_left'  => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Левая граница"',
             'tree_right' => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Правая граница"',
             'tree_order' => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Сортировка в ветке"',
         ], 'COMMENT "Контент курсов(учебников)"');
+
+        $b->createIndex('lms_courses', 'lms_courses_course_id', ['course_id']);
 
         $b->createTable('lms_tests', [
             'id'                       => 'INT      UNSIGNED AUTO_INCREMENT PRIMARY KEY         COMMENT "Id теста"',
@@ -54,12 +56,15 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'is_display_all_questions' => 'BOOLEAN           NOT NULL DEFAULT 0                 COMMENT "Отображение вопросов на странице (0 - один/ 1 - все)"',
             'is_visible_result'        => 'BOOLEAN           NOT NULL DEFAULT 0                 COMMENT "Видны ли ответы после прохождения теста (0 - нет/ 1 - да)"',
             'is_random_questions'      => 'BOOLEAN           NOT NULL DEFAULT 0                 COMMENT "Перемешивать вопросы (0 - нет/ 1 - да)"',
-            'attempt_count'            => 'INT      UNSIGNED     NULL                           COMMENT "Количество попыток"',
-            'question_count'           => 'INT      UNSIGNED     NULL                           COMMENT "Кол-во вопросов"',
-            'time_limit'               => 'INT      UNSIGNED     NULL                           COMMENT "Ограничение времени (в секундах)"',
+            'attempt_count'            => 'INT      UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Количество попыток"',
+            'question_count'           => 'INT      UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Кол-во вопросов"',
+            'time_limit'               => 'INT      UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Ограничение времени (в секундах)"',
             'start_at'                 => 'DATETIME          NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT "Дата открытия теста"',
             'end_at'                   => 'DATETIME              NULL                           COMMENT "Дата закрытия теста"',
         ], 'COMMENT "Тесты"');
+
+        $b->createIndex('lms_tests', 'lms_tests_course_id', ['course_id']);
+        $b->createIndex('lms_tests', 'lms_tests_category_id', ['category_id']);
 
         $b->createTable('lms_tests_categories', [
             'id'        => 'INT          UNSIGNED AUTO_INCREMENT COMMENT "Id теста" PRIMARY KEY',
@@ -77,9 +82,12 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'id'          => 'INT        UNSIGNED AUTO_INCREMENT COMMENT "Id вопроса" PRIMARY KEY',
             'course_id'   => 'INT        UNSIGNED NOT NULL       COMMENT "Id курса(учебника)"',
             'category_id' => 'INT        UNSIGNED     NULL       COMMENT "Id категории"',
-            'type'        => 'TINYINT(1) UNSIGNED NOT NULL       COMMENT "Тип вопроса (ед. выбор/множ. выбор и т.д)"',
             'title'       => 'TEXT                NOT NULL       COMMENT "Название вопроса"',
+            'type'        => 'TINYINT(1) UNSIGNED NOT NULL       COMMENT "1 - \"Да/Нет\",\n2 - \"Короткий ответ\",\n3 - \"Множ. выбор\",\n4 - \"Множ. ответ\",\n5 - \"Соответствие\",\n6 - \"Сортировка\""',
         ], 'COMMENT "Вопросы теста"');
+
+        $b->createIndex('lms_tests_questions', 'lms_tests_questions_course_id', ['course_id']);
+        $b->createIndex('lms_tests_questions', 'lms_tests_questions_category_id', ['category_id']);
 
         $b->createTable('lms_tests_questions_categories', [
             'id'        => 'INT          UNSIGNED AUTO_INCREMENT COMMENT "Id категории" PRIMARY KEY',
@@ -114,6 +122,8 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'is_correct'  => 'BOOLEAN          NOT NULL DEFAULT 0 COMMENT "0 - не верный/1 - верный"',
         ], 'COMMENT "Ответы на вопросы теста"');
 
+        $b->createIndex('lms_tests_answers', 'lms_tests_answers_question_id', ['question_id']);
+
         $b->createTable('lms_tests_attempts', [
             'id'          => 'INT        UNSIGNED AUTO_INCREMENT PRIMARY KEY         COMMENT "Id попытки"',
             'user_id'     => 'INT        UNSIGNED NOT NULL                           COMMENT "Id пользователя"',
@@ -124,6 +134,9 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'grade'       => 'FLOAT(5,2) UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Оценка в %"'
         ], 'COMMENT "Попытки прохождения теста"');
 
+        $b->createIndex('lms_tests_attempts', 'lms_tests_attempts_user_id', ['user_id']);
+        $b->createIndex('lms_tests_attempts', 'lms_tests_attempts_test_id', ['test_id']);
+
         $b->createTable('lms_tests_results', [
             'id'          => 'INT   UNSIGNED AUTO_INCREMENT COMMENT "Id результата" PRIMARY KEY',
             'attempt_id'  => 'INT   UNSIGNED NOT NULL       COMMENT "Id попытки"',
@@ -131,6 +144,9 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'answer_id'   => 'INT   UNSIGNED     NULL       COMMENT "Id ответа"',
             'answer_text' => 'TEXT               NULL       COMMENT "текст ответа (если текстовый ответ)"',
         ], 'COMMENT "Результаты"');
+
+        $b->createIndex('lms_tests_results', 'lms_tests_results_attempt_id', ['attempt_id']);
+        $b->createIndex('lms_tests_results', 'lms_tests_results_question_id', ['question_id']);
     }
 
     /**

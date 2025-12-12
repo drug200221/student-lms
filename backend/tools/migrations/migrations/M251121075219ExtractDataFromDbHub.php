@@ -18,6 +18,10 @@ use Yiisoft\Db\Mysql\Dsn;
 final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInterface
 {
     private const SEPARATOR = '|__SEP_ANS_AND_QUEST__|'; // сепаратор для ответов и вопросов
+
+    /** @var Connection|null */
+    private static $externalConnection;
+
     private static function getExternalDbConnection(): Connection
     {
         $dsn_hub = new Dsn(
@@ -27,7 +31,12 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             '3307',
             ['charset' => 'utf8mb4']
         );
-        return new Connection(
+
+        if (self::$externalConnection) {
+            return self::$externalConnection;
+        }
+
+        self::$externalConnection =  new Connection(
             new Driver(
                 $dsn_hub->asString(),
                 'user',
@@ -35,6 +44,8 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             ),
             new SchemaCache(new ArrayCache())
         );
+
+        return self::$externalConnection;
     }
 
     /**
@@ -44,21 +55,12 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     public function up(MigrationBuilder $b): void
     {
-        while (true) {
-            echo "Раскомментировал TODO? (Y/N): ";
-            $input = trim(fgets(STDIN));
-            $answer = mb_strtolower($input);
-
-            if ($answer === 'y') {
-                break;
-            }
-            if ($answer === 'n') {
-                exit("Завершение работы.\n");
-            }
-            echo "Пожалуйста, введите 'Y' или 'N'.\n";
-        }
+        self::getExternalDbConnection()->open();
+        $b->getDb()->open();
 
         $transaction = $b->getDb()->beginTransaction();
+        $externalTransaction = self::getExternalDbConnection()->beginTransaction();
+
         try {
             self::importCourses($b);
             self::importContents($b);
@@ -70,11 +72,14 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             self::importAttempts($b);
 
             $transaction->commit();
-
-            $b->getDb()->close();
         } catch (Throwable $e) {
             $transaction->rollBack();
             throw $e;
+        } finally {
+            $externalTransaction->rollBack(); // отменяем все изменения внесенные в бд ХАБа
+
+            self::getExternalDbConnection()->close();
+            $b->getDb()->close();
         }
     }
 
@@ -116,7 +121,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             ->createCommand("UPDATE AT_courses c SET c.release_date = 
                 IF(c.release_date = '0000-00-00 00:00:00', '2015-01-01 00:00:00', c.release_date)")->execute(); // нулевые даты меняем на корректные
 
-        $select = "SELECT course_id, title, description, cat_id, 
+        $select = "SELECT course_id, title, NULLIF(TRIM(description), '') AS description, cat_id, 
            IF(type_course = 'stud', 1, 
               IF(type_course = 'cdpo', 2, 
                  IF(type_course = 'avto', 3, 1)
@@ -154,8 +159,6 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                 END
             WHERE c.release_date = '0000-00-00 00:00:00';")->execute(); // нулевые даты меняем на корректные
 
-        $select = "SELECT content_id, course_id, title, text, content_path, content_parent_id, release_date, last_modified, revision, content_type FROM AT_content";
-
         $columnMap = [
             'id'         => 'content_id',
             'course_id'  => 'course_id',
@@ -167,11 +170,47 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             'updated_at' => 'last_modified',
             'revision'   => 'revision',
             'type'       => 'content_type',
+            'tree_level' => 'zero_value',
+            'tree_left'  => 'zero_value',
+            'tree_right' => 'zero_value',
+            'tree_order' => 'zero_value',
         ];
 
-        self::importData($select, 'lms_contents', $columnMap, $b);
+        $courseIds = self::getExternalDbConnection()->createCommand("SELECT DISTINCT course_id FROM AT_content")->queryColumn();
 
-//        $b->execute("CALL rebuildNestedSetTreeV2('lms_contents', 'tree_order', 'id', 'parent_id')"); TODO: РАСКОММЕНТИРОВАТЬ *длительное время выполнения
+        foreach ($courseIds as $courseId) {
+            $select = "SELECT content_id, course_id, title, text, NULLIF(TRIM(content_path), '') AS path, content_parent_id, release_date, last_modified, revision, content_type, 0 as zero_value FROM AT_content WHERE course_id = :course_id";
+
+            $rows =  self::getExternalDbConnection()->createCommand($select)->bindValue(':course_id', $courseId)->queryAll();
+
+            $insertData = [];
+            foreach ($rows as $row) {
+                $data = [];
+                foreach ($columnMap as $i => $s) {
+                    $data[$i] = $row[$s];
+                }
+                $insertData[] = $data;
+            }
+
+            $counter = 1;
+            self::rebuildNestedSetTree($insertData, 0, 1, $counter);
+
+            $b->batchInsert('lms_contents', array_keys($columnMap), $insertData);
+        }
+    }
+
+    private static function rebuildNestedSetTree(array &$contents, int $parentId, int $level, int &$counter): void
+    {
+        foreach ($contents as &$node) {
+            if ((int)$node['parent_id'] === $parentId) {
+                $node['tree_left'] = $counter++;
+                $node['tree_level'] = $level;
+
+                self::rebuildNestedSetTree($contents, (int)$node['id'], $level + 1, $counter);
+
+                $node['tree_right'] = $counter++;
+            }
+        }
     }
 
     /**
@@ -345,7 +384,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
 //            '3' => 2, SKIP  ShortAnswer - уже реализован
 //            '4' => 8, SKIP  Likert или какой либо еще тип, подумаем
                 '5' => 5, // accordance
-                '6' => 7, // ordering
+                '6' => 6, // ordering
                 '7' => 4, // multiResponse
                 '8' => 5, // accordance
             ];
@@ -441,13 +480,13 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
         $select = "SELECT result_id, test_id, member_id, COALESCE(NULLIF(final_score, ''), 0) AS grade, status, date_taken, end_time FROM AT_tests_results";
 
         $columnMap = [
-            'id' => 'result_id',
-            'user_id' => 'member_id',
-            'test_id' => 'test_id',
-            'grade' => 'grade',
+            'id'          => 'result_id',
+            'user_id'     => 'member_id',
+            'test_id'     => 'test_id',
+            'grade'       => 'grade',
             'is_finished' => 'status',
-            'start_at' => 'date_taken',
-            'end_at' => 'end_time',
+            'start_at'    => 'date_taken',
+            'end_at'      => 'end_time',
         ];
 
         self::importData($select, 'lms_tests_attempts', $columnMap, $b);
@@ -611,23 +650,18 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
     private static function importData(
         string $select,
         string $insertTable,
-        array $columnMap,
+        array  $columnMap,
         MigrationBuilder $b
     ): void
     {
         $limit = 10000;
         $offset = 0;
 
-        $insertColumns = [];
-        foreach ($columnMap as $i => $s) {
-            $insertColumns[] = $i;
-        }
-
         do {
             $rows = self::getExternalDbConnection()
                 ->createCommand("$select LIMIT :limit OFFSET :offset")
                 ->bindValues([
-                    ":limit"  => $limit,
+                    ":limit" => $limit,
                     ':offset' => $offset
                 ])
                 ->queryAll();
@@ -646,7 +680,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                 $insertData[] = $data;
             }
 
-            $b->batchInsert($insertTable, $insertColumns, $insertData);
+            $b->batchInsert($insertTable, array_keys($columnMap), $insertData);
 
             $offset += $limit;
         } while (true);
