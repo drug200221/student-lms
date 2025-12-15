@@ -34,6 +34,7 @@ final class CourseService implements RestServiceInterface
     /**
      * @param positive-int $id
      * @return NotFoundResult|SuccessResult
+     * @throws \ReflectionException
      */
     public function get($id): AbstractResult
     {
