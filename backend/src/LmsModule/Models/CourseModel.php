@@ -65,7 +65,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return positive-int
      */
-    final public function getId(): int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -73,7 +73,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return string
      */
-    final public function getTitle(): string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -82,7 +82,7 @@ final class CourseModel implements \JsonSerializable
      * @param string $title
      * @return self
      */
-    final public function setTitle(string $title): self
+    public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -91,7 +91,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return string|null
      */
-    final public function getDescription(): ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -100,7 +100,7 @@ final class CourseModel implements \JsonSerializable
      * @param string|null $description
      * @return self
      */
-    final public function setDescription(?string $description): self
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
         return $this;
@@ -109,7 +109,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return positive-int
      */
-    final public function getBaseId(): int
+    public function getBaseId(): int
     {
         return $this->baseId;
     }
@@ -118,7 +118,7 @@ final class CourseModel implements \JsonSerializable
      * @param positive-int $baseId
      * @return self
      */
-    final public function setBaseId(int $baseId): self
+    public function setBaseId(int $baseId): self
     {
         $this->baseId = $baseId;
         return $this;
@@ -127,7 +127,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return int<1|2|3>
      */
-    final public function getType(): int
+    public function getType(): int
     {
         return $this->type;
     }
@@ -136,7 +136,7 @@ final class CourseModel implements \JsonSerializable
      * @param int<1|2|3> $type
      * @return self
      */
-    final public function setType(int $type): self
+    public function setType(int $type): self
     {
         $this->type = $type;
         return $this;
@@ -145,7 +145,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return \DateTimeImmutable
      */
-    final public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -154,7 +154,7 @@ final class CourseModel implements \JsonSerializable
      * @param \DateTimeImmutable $createdAt
      * @return self
      */
-    final public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -163,7 +163,7 @@ final class CourseModel implements \JsonSerializable
     /**
      * @return int<0,100>
      */
-    final public function getFillProgress(): int
+    public function getFillProgress(): int
     {
         return $this->fillProgress;
     }
@@ -172,13 +172,13 @@ final class CourseModel implements \JsonSerializable
      * @param int<0,100> $fillProgress
      * @return self
      */
-    final public function setFillProgress(int $fillProgress): self
+    public function setFillProgress(int $fillProgress): self
     {
         $this->fillProgress = $fillProgress;
         return $this;
     }
 
-    final public function jsonSerialize(): array
+    public function jsonSerialize(): array
     {
         return [
             'id'           => $this->id,
