@@ -31,6 +31,36 @@ return [
 			],
 		],
 	],
+	'lms.Admin.Courses.QuestionCategories.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '/lms/api/v1/admin/courses/question-categories[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Questions\QuestionCategoryController::class,
+				'_controllerDir' => 'r-e-s-t/admin/questions/question-category',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
+	'lms.Admin.Courses.Questions.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '/lms/api/v1/admin/courses/questions[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Questions\QuestionController::class,
+				'_controllerDir' => 'r-e-s-t/admin/questions/question',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
 	'lms.Admin.Courses.TestCategories.REST' => [
 		'type' => 'segment',
 		'options' => [

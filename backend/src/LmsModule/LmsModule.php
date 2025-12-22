@@ -26,7 +26,7 @@ final class LmsModule implements ModuleInterface
 
     public function getName(): string
     {
-        $className = static::class;
+        $className = __CLASS__;
         return substr($className, strrpos($className, '\\') + 1);
     }
 
