@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7f863c81440a066533e3c317e454dffa",
+    "content-hash": "7fcc66b6c39a6935a7b29d4da626880c",
     "packages": [
         {
             "name": "0x3a/student-acl",
@@ -277,17 +277,17 @@
         },
         {
             "name": "0x3a/student-forms",
-            "version": "1.8.0",
+            "version": "1.10.3-rc",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/zaharov-a/student-forms.git",
-                "reference": "534338924302e24e3aa63787e87c3bc78ef677d7"
+                "reference": "d5bd417122af8ccb30b6d3d60ab008edd196fc14"
             },
             "dist": {
                 "type": "tar",
-                "url": "s3://packagist.storage.yandexcloud.net/dist/0x3a/student-forms/0x3a-student-forms-534338924302e24e3aa63787e87c3bc78ef677d7-zip-dd4f85.tar",
-                "reference": "534338924302e24e3aa63787e87c3bc78ef677d7",
-                "shasum": "52ca726d63b782613cc471b97b125fef48df14b2"
+                "url": "s3://packagist.storage.yandexcloud.net/dist/0x3a/student-forms/0x3a-student-forms-d5bd417122af8ccb30b6d3d60ab008edd196fc14-zip-78fbc9.tar",
+                "reference": "d5bd417122af8ccb30b6d3d60ab008edd196fc14",
+                "shasum": "a4be9228a80bc0ebed87f4eb3d7fef7e73bc3d74"
             },
             "require": {
                 "ext-json": "*",
@@ -305,12 +305,13 @@
             "autoload": {
                 "psr-4": {
                     "Ox3a\\Form\\": "src/Form",
+                    "Ox3a\\InputFilter\\": "src/InputFilter",
                     "Ox3a\\Annotation\\Form\\": "src/Annotation"
                 }
             },
             "scripts": {
                 "tests": [
-                    "docker run --rm -v ${PWD}:/app -w /app php:5.6-zts-alpine php ./vendor/bin/phpunit ./tests"
+                    "docker run --rm -v ${PWD}:/app -w /app php:5.6-zts-alpine php -d display_errors=On -d error_reporting=E_ALL ./vendor/bin/phpunit ./tests"
                 ]
             },
             "authors": [
@@ -321,10 +322,10 @@
             ],
             "homepage": "https://bitbucket.org/zaharov-a/student-forms",
             "support": {
-                "source": "https://bitbucket.org/zaharov-a/student-forms/src/534338924302e24e3aa63787e87c3bc78ef677d7/?at=1.8.0",
+                "source": "https://bitbucket.org/zaharov-a/student-forms/src/d5bd417122af8ccb30b6d3d60ab008edd196fc14/?at=1.10.3-rc",
                 "issues": "https://bitbucket.org/zaharov-a/student-forms/issues"
             },
-            "time": "2024-12-27T07:55:09+00:00"
+            "time": "2025-12-19T16:10:12+00:00"
         },
         {
             "name": "0x3a/student-json-rpc",
@@ -3611,7 +3612,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "0x3a/student-forms": 5
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

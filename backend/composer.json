@@ -34,7 +34,8 @@
         "0x3a/student-common": "^1.25",
         "0x3a/student-app": "^1.11",
         "psk/student-rest": "^1",
-        "ext-json": "*"
+        "ext-json": "*",
+        "0x3a/student-forms": "^1.10.1-rc"
     },
     "require-dev": {
         "0x3a/student-annotation": "^2.13.1",
@@ -43,7 +44,7 @@
     "scripts": {
         "install-tools": "@composer --working-dir=dev-tools install",
         "tests": "@php vendor/bin/phpunit tests",
-        "phpstan":  "@php dev-tools/vendor/bin/phpstan analyze -c phpstan.neon",
+        "phpstan":  "@php tools/phpstan/vendor/bin/phpstan analyze -c phpstan.neon",
         "post-create-project-cmd": [
             "cp development/configs/example/* development/configs/",
             "@collect-static"

@@ -6,6 +6,12 @@ parameters:
         - vendor
     universalObjectCratesClasses:
         - Ox3a\Common\View\HtmlView
+    ignoreErrors:
+        - message: '#Property .+ is never read, only written\.#'
+          path: src/LmsModule/LmsModule.php
+        - message: '#Property .+ is never written, only read\.#'
+          paths:
+              -  src/LmsModule/Models/**
 includes:
-    - dev-tools/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - tools/phpstan/vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/0x3a/student-common/phpstan.extensions.neon
