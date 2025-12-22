@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Psk\LmsModule\Models\Requests\Questions;
 
 use Ox3a\Annotation\Form;
-use Psk\MessengerModule\Annotations\RecordExistsValidator;
+use Psk\MessengerModule\Annotations\NoRecordExistsValidator;
 
 /**
  * @internal
@@ -17,7 +17,7 @@ class QuestionCategoryRequestModel
      * @Form\Element("hidden")
      * @Form\Attribute(true, name="required")
      * @Form\Validator(@Form\Validator\DigitsValidator())
-     * @Form\Validator(@RecordExistsValidator(table="lms_courses", field="id"))
+     * @Form\Validator(@NoRecordExistsValidator(select="courseId"))
      * @Form\Filter(@Form\Filter\ToIntFilter())
      * @var positive-int
      */

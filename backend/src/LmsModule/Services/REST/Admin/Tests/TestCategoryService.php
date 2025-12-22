@@ -14,6 +14,7 @@ use Psk\RestModule\Results\InternalServerErrorResult;
 use Psk\RestModule\Results\NotFoundResult;
 use Psk\RestModule\Results\SuccessResult;
 use Psk\RestModule\Results\ValidationErrorsResult;
+use Zend\Db\Sql\Select;
 
 /**
  * @internal
@@ -94,6 +95,7 @@ final class TestCategoryService implements RestServiceInterface
      * @param positive-int $id
      * @param array<string,mixed> $data
      * @return AbstractResult
+     * @throws \ReflectionException
      */
     public function update($id, $data): AbstractResult
     {
@@ -103,13 +105,15 @@ final class TestCategoryService implements RestServiceInterface
             return new NotFoundResult();
         }
 
-        $form = $this->getForm($data);
+        $form = $this->getForm($data, $id);
 
         if (!$form->isValid()) {
             return new ValidationErrorsResult($form->getMessages());
         }
 
         $category->setTitle($form->getDataModel()->title);
+
+        $this->categoryRepository->save($category);
 
         return new SuccessResult($category);
     }
@@ -135,11 +139,27 @@ final class TestCategoryService implements RestServiceInterface
 
     /**
      * @param array<string,mixed> $data
+     * @param positive-int $id
      * @return TestCategoryFormModel
      */
-    private function getForm(array $data): TestCategoryFormModel
+    private function getForm(array $data, int $id = 0): TestCategoryFormModel
     {
-        $this->form ?: ($this->form = new TestCategoryFormModel(null, ['db' => $this->dbService]));
+        $select = new Select();
+        $select
+            ->columns(['course_id'])
+            ->from('lms_tests_categories')
+            ->where
+            ->equalTo('course_id', $data['courseId'])
+            ->equalTo('title', $data['title']);
+
+        if ($id) {
+            $select->where->equalTo('id', $id);
+        }
+
+        $this->form ?: ($this->form = new TestCategoryFormModel(null, [
+            'db' => $this->dbService,
+            'courseId' => $select,
+        ]));
 
         return $this->form->setData($data);
     }

@@ -29,11 +29,8 @@ class TestCategoryFormModel extends FormModel
                 ],
                 'validators' => [
                     new \Zend\Validator\Digits(),
-                    new \Zend\Validator\Db\RecordExists([
-                        'adapter' => $this->getOption('db')->getAdapter(),
-                        'table' => 'lms_courses',
-                        'field' => 'id'
-                    ]),
+                    (new \Zend\Validator\Db\NoRecordExists($this->getOption('courseId')))
+                        ->setAdapter($this->getOption('db')->getAdapter()),
                 ],
                 'type' => \Ox3a\Form\Model\HiddenModel::class,
             ]

@@ -14,6 +14,7 @@ use Psk\RestModule\Results\InternalServerErrorResult;
 use Psk\RestModule\Results\NotFoundResult;
 use Psk\RestModule\Results\SuccessResult;
 use Psk\RestModule\Results\ValidationErrorsResult;
+use Zend\Db\Sql\Select;
 
 /**
  * @internal
@@ -69,9 +70,9 @@ final class QuestionCategoryService implements RestServiceInterface
      */
     public function create($data): AbstractResult
     {
-        $form = $this->getForm();
+        $form = $this->getForm($data);
 
-        if (!$form->setData($data)->isValid()) {
+        if (!$form->isValid()) {
             return new ValidationErrorsResult($form->getMessages());
         }
 
@@ -92,6 +93,7 @@ final class QuestionCategoryService implements RestServiceInterface
      * @param positive-int $id
      * @param array<string,mixed> $data
      * @return AbstractResult
+     * @throws \ReflectionException
      */
     public function update($id, $data): AbstractResult
     {
@@ -101,13 +103,15 @@ final class QuestionCategoryService implements RestServiceInterface
             return new NotFoundResult();
         }
 
-        $form = $this->getForm();
+        $form = $this->getForm($data, $id);
 
-        if (!$form->setData($data)->isValid()) {
+        if (!$form->isValid()) {
             return new ValidationErrorsResult($form->getMessages());
         }
 
         $category->setTitle($form->getDataModel()->title);
+
+        $this->categoryRepository->save($category);
 
         return new SuccessResult($category);
     }
@@ -132,10 +136,30 @@ final class QuestionCategoryService implements RestServiceInterface
     }
 
     /**
+     *
+     * @param array<string,mixed> $data
+     * @param positive-int $id
      * @return QuestionCategoryFormModel
      */
-    private function getForm(): QuestionCategoryFormModel
+    private function getForm(array $data, int $id = 0): QuestionCategoryFormModel
     {
-        return $this->form ?: ($this->form = new QuestionCategoryFormModel());
+        $select = new Select();
+
+        $select->columns(['course_id'])
+            ->from('lms_tests_questions_categories')
+            ->where
+            ->equalTo('course_id', $data['courseId'])
+            ->equalTo('title', $data['title']);
+
+        if ($id) {
+            $select->where->equalTo('id', $id);
+        }
+
+        $this->form ?: ($this->form = new QuestionCategoryFormModel(null, [
+            'db' => $this->dbService,
+            'courseId' => $select,
+        ]));
+
+        return $this->form->setData($data);
     }
 }

@@ -29,11 +29,8 @@ class QuestionCategoryFormModel extends FormModel
                 ],
                 'validators' => [
                     new \Zend\Validator\Digits(),
-                    new \Zend\Validator\Db\RecordExists([
-                        'adapter' => $this->getOption('db')->getAdapter(),
-                        'table' => 'lms_courses',
-                        'field' => 'id'
-                    ]),
+                    (new \Zend\Validator\Db\NoRecordExists($this->getOption('courseId')))
+                        ->setAdapter($this->getOption('db')->getAdapter()),
                 ],
                 'type' => \Ox3a\Form\Model\HiddenModel::class,
             ]
@@ -44,7 +41,7 @@ class QuestionCategoryFormModel extends FormModel
                 'attributes' => [
                     'escapeAttr' => false,
                     'required' => true,
-                    'placeholder' => "Введите вопрос",
+                    'placeholder' => "Введите названиие категории",
                 ],
                 'options' => [
                     'label' => "Вопрос",
