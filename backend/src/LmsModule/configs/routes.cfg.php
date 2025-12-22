@@ -61,6 +61,21 @@ return [
 			],
 		],
 	],
+	'.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Tests\AttemptController::class,
+				'_controllerDir' => 'r-e-s-t/admin/tests/attempt',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
 	'lms.Admin.Courses.TestCategories.REST' => [
 		'type' => 'segment',
 		'options' => [

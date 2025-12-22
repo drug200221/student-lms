@@ -17,28 +17,29 @@ use Yiisoft\Db\Mysql\Dsn;
  */
 final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInterface
 {
-    private const SEPARATOR = '|__SEP_ANS_AND_QUEST__|'; // сепаратор для ответов и вопросов
+    private const SEPARATOR = '|__SEP_ANSWER__|'; // сепаратор для ответов
+    private const LIMIT = 5000;
 
     /** @var Connection|null */
     private static $externalConnection;
 
     private static function getExternalDbConnection(): Connection
     {
-        $dsn_hub = new Dsn(
-            'mysql',
-            '192.168.100.100',
-            getenv('DATABASE_NAME'),
-            '3307',
-            ['charset' => 'utf8mb4']
-        );
-
         if (self::$externalConnection) {
             return self::$externalConnection;
         }
-
+        
+        $dsnHub = new Dsn(
+            'mysql',
+            '192.168.100.100',
+            getenv('DATABASE_NAME'),
+            '3306',
+            ['charset' => 'utf8mb4']
+        );
+        
         self::$externalConnection =  new Connection(
             new Driver(
-                $dsn_hub->asString(),
+                $dsnHub->asString(),
                 'user',
                 'user'
             ),
@@ -128,7 +129,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
               )
            ) AS type,
            created_date, state 
-           FROM AT_courses";
+           FROM AT_courses WHERE course_id > :lastId ORDER BY course_id";
 
         $columnMap = [
             'id'            => 'course_id',
@@ -164,7 +165,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             'course_id'  => 'course_id',
             'title'      => 'title',
             'content'    => 'text',
-            'path'       => 'content_path',
+            'path'       => 'path',
             'parent_id'  => 'content_parent_id',
             'created_at' => 'release_date',
             'updated_at' => 'last_modified',
@@ -179,7 +180,8 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
         $courseIds = self::getExternalDbConnection()->createCommand("SELECT DISTINCT course_id FROM AT_content")->queryColumn();
 
         foreach ($courseIds as $courseId) {
-            $select = "SELECT content_id, course_id, title, text, NULLIF(TRIM(content_path), '') AS path, content_parent_id, release_date, last_modified, revision, content_type, 0 as zero_value FROM AT_content WHERE course_id = :course_id";
+            $select = "SELECT content_id, course_id, title, text, NULLIF(TRIM(content_path), '') AS path, content_parent_id, release_date, last_modified, revision, content_type, 0 as zero_value 
+                            FROM AT_content WHERE course_id = :course_id";
 
             $rows =  self::getExternalDbConnection()->createCommand($select)->bindValue(':course_id', $courseId)->queryAll();
 
@@ -206,7 +208,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                 $node['tree_left'] = $counter++;
                 $node['tree_level'] = $level;
 
-                self::rebuildNestedSetTree($contents, (int)$node['id'], $level + 1, $counter);
+                self::rebuildNestedSetTree($contents, (int) $node['id'], $level + 1, $counter);
 
                 $node['tree_right'] = $counter++;
             }
@@ -221,13 +223,14 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     private static function importTestsCategories(MigrationBuilder $b): void
     {
-        $select = "SELECT MIN(test_category_id) as id, course_id,  title FROM AT_tests_categories GROUP BY course_id, title";
+        $select = "SELECT MIN(test_category_id) as id, course_id,  title FROM AT_tests_categories GROUP BY course_id, title HAVING MIN(test_category_id) > :lastId ORDER BY id";
 
         $columnMap = [
             'id'        => 'id',
             'course_id' => 'course_id',
             'title'     => 'title',
         ];
+
         self::importData($select, 'lms_tests_categories', $columnMap, $b);
     }
 
@@ -248,7 +251,11 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                 END
             WHERE t.start_date = '0000-00-00 00:00:00';")->execute(); // нулевые даты меняем на корректные
 
-        $select = "SELECT test_id, course_id, test_category_id, title, description, display, result_release, random, num_takes, num_questions, null as `null`, start_date, end_date FROM AT_tests";
+        self::getExternalDbConnection()->createCommand(
+            "UPDATE AT_tests t SET t.test_category_id = null WHERE t.test_category_id <= 0")->execute(); // категории меньше положительного делаем null
+
+        $select = "SELECT test_id, course_id, test_category_id, title, description, display, result_release, random, num_takes, num_questions, 0 as `zero`, start_date, end_date 
+                    FROM AT_tests WHERE test_id > :lastId ORDER BY test_id";
 
         $columnMap = [
             'id'                       => 'test_id',
@@ -261,7 +268,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             'is_random_questions'      => 'random',
             'attempt_count'            => 'num_takes',
             'question_count'           => 'num_questions',
-            'time_limit'               => 'null',
+            'time_limit'               => 'zero',
             'start_at'                 => 'start_date',
             'end_at'                   => 'end_date',
         ];
@@ -270,69 +277,23 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
     }
 
     /**
+     * @param MigrationBuilder $b
      * @throws InvalidConfigException
-     * @throws Throwable
      * @throws NotSupportedException
+     * @throws Throwable
      * @throws \Yiisoft\Db\Exception\Exception
      */
     private static function importQuestionsCategories(MigrationBuilder $b): void
     {
-        $limit = 10000;
-        $offset = 0;
+        $select = "SELECT MIN(category_id) as id, course_id,  title FROM AT_tests_questions_categories GROUP BY course_id, title HAVING MIN(category_id) > :lastId ORDER BY id";
 
-        do {
-            $groupMinCategoryIds = self::getExternalDbConnection()
-                ->createCommand("SELECT MIN(category_id) as min_id, course_id, title 
-                    FROM AT_tests_questions_categories GROUP BY course_id, title LIMIT :limit OFFSET :offset")
-                ->bindValues([
-                    ':limit' => $limit,
-                    ':offset' => $offset,
-                ])
-                ->queryAll();
+        $columnMap = [
+            'id'        => 'category_id',
+            'course_id' => 'course_id',
+            'title'     => 'title',
+        ];
 
-            if (empty($groupMinCategoryIds)) {
-                break;
-            }
-
-            // избавляемся от дублей
-            foreach ($groupMinCategoryIds as $group) {
-                $minId    = $group['min_id'];
-                $courseId = $group['course_id'];
-                $title    = $group['title'];
-
-                self::getExternalDbConnection()
-                    ->createCommand(
-                        "UPDATE AT_tests_questions_categories c SET c.category_id = :minId WHERE c.course_id = :courseId AND c.title = :title"
-                    )->bindValues([
-                        ':minId' => $minId,
-                        ':courseId' => $courseId,
-                        ':title' => $title,
-                    ])->execute();
-
-                self::getExternalDbConnection()
-                    ->createCommand(
-                        "UPDATE AT_tests_questions q JOIN AT_tests_questions_categories c
-                        ON q.course_id = c.course_id AND q.title = c.title
-                     SET q.category_id = :minId WHERE c.course_id = :courseId AND c.title = :title"
-                    )->bindValues([
-                        ':minId' => $minId,
-                        ':courseId' => $courseId,
-                        ':title' => $title,
-                    ])->execute();
-            }
-
-            $select = "SELECT category_id, course_id, title FROM AT_tests_questions_categories GROUP BY course_id, title";
-
-            $columnMap = [
-                'id'        => 'category_id',
-                'course_id' => 'course_id',
-                'title'     => 'title',
-            ];
-
-            self::importData($select, 'lms_tests_questions_categories', $columnMap, $b);
-
-            $offset += $limit;
-        } while (true);
+        self::importData($select, 'lms_tests_questions_categories', $columnMap, $b);
     }
 
     /**
@@ -343,7 +304,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     private static function importQuestionsOfTests(MigrationBuilder $b): void
     {
-        $select = "SELECT test_id, question_id, weight, required FROM AT_tests_questions_assoc";
+        $select = "SELECT test_id, question_id, weight, required FROM AT_tests_questions_assoc ORDER BY test_id";
 
         $columnMap = [
             'test_id'     => 'test_id',
@@ -352,7 +313,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             'is_required' => 'required',
         ];
 
-        self::importData($select, 'lms_tests_questions_of_tests', $columnMap, $b);
+        self::importData($select, 'lms_tests_questions_of_tests', $columnMap, $b, true);
     }
 
     /**
@@ -362,15 +323,14 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     private static function importQuestionsAndAnswers(MigrationBuilder $b): void
     {
-        $limit = 10000;
-        $offset = 0;
+        $lastQuestionId = 0;
 
         do {
             $rows = self::getExternalDbConnection()
-                ->createCommand("SELECT * FROM AT_tests_questions ORDER BY question_id ASC LIMIT :limit OFFSET :offset")
+                ->createCommand("SELECT * FROM AT_tests_questions WHERE question_id > :lastQuestionId ORDER BY question_id ASC LIMIT :limit")
                 ->bindValues([
-                    ':limit' => $limit,
-                    ':offset' => $offset,
+                    ':lastQuestionId' => $lastQuestionId,
+                    ':limit' => self::LIMIT,
                 ])
                 ->queryAll();
 
@@ -381,8 +341,8 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             $mappingType = [
                 '1' => 3, // multiChoice
                 '2' => 1, // true/false
-//            '3' => 2, SKIP  ShortAnswer - уже реализован
-//            '4' => 8, SKIP  Likert или какой либо еще тип, подумаем
+               // '3' => 2, SKIP  ShortAnswer - уже реализован
+               // '4' => 8, SKIP  Likert или какой либо еще тип, подумаем
                 '5' => 5, // accordance
                 '6' => 6, // ordering
                 '7' => 4, // multiResponse
@@ -396,7 +356,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                         'course_id' => $row['course_id'],
                         'category_id' => $row['category_id'] === '0' ? null : $row['category_id'],
                         'type' => $mappingType[$row['type']],
-                        'title' => $row['question'],
+                        'question' => $row['question'],
                     ];
 
                     $b->insert('lms_tests_questions', $questionData);
@@ -411,7 +371,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                                 case 1:
                                     $answers[] = [
                                         'question_id' => $row['question_id'],
-                                        'title' => $i === 0 ? 'Да' : 'Нет',
+                                        'answer' => $i === 0 ? 'Да' : 'Нет',
                                         'is_correct' => $row["answer_$i"],
                                     ];
                                     break;
@@ -419,15 +379,15 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                                 case 4:
                                     $answers[] = [
                                         'question_id' => $row['question_id'],
-                                        'title' => $choice,
+                                        'answer' => $choice,
                                         'is_correct' => $row["answer_$i"],
                                     ];
                                     break;
                                 case 5:
-                                    if ((int)$row["answer_$i"] !== -1) {
+                                    if ((int) $row["answer_$i"] !== -1) {
                                         $answers[] = [
                                             'question_id' => $row['question_id'],
-                                            'title' => $row['option_' . $row["answer_$i"]] . self::SEPARATOR . $choice,
+                                            'answer' => $choice . self::SEPARATOR . $row['option_' . $row["answer_$i"]],
                                             'is_correct' => 1,
                                         ];
                                     } else {
@@ -435,37 +395,37 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                                         if ($answer !== '') {
                                             $answers[] = [
                                                 'question_id' => $row['question_id'],
-                                                'title' => $answer . self::SEPARATOR . 'empty',
+                                                'answer' => 'empty' . self::SEPARATOR . $answer,
                                                 'is_correct' => 1,
                                             ];
                                         }
                                         $answers[] = [
                                             'question_id' => $row['question_id'],
-                                            'title' => 'empty' . self::SEPARATOR . $choice,
+                                            'answer' => $choice . self::SEPARATOR . 'empty',
                                             'is_correct' => 1,
                                         ];
                                     }
                                     break;
-                                case 7:
+                                case 6:
                                     $ordering[] = $choice;
                                     break;
                             }
                         }
                     }
 
-                    if ($questionData['type'] === 7) {
+                    if ($questionData['type'] === 6) {
                         $answers[] = [
                             'question_id' => $questionData['id'],
-                            'title' => implode(self::SEPARATOR, $ordering),
+                            'answer' => implode(self::SEPARATOR, $ordering),
                             'is_correct' => 1,
                         ];
                     }
 
-                    $b->batchInsert('lms_tests_answers', ['question_id', 'title', 'is_correct'], $answers);
+                    $b->batchInsert('lms_tests_answers', ['question_id', 'answer', 'is_correct'], $answers);
                 }
-            }
 
-            $offset += $limit;
+                $lastQuestionId = $row['question_id'];
+            }
         } while (true);
     }
 
@@ -477,7 +437,8 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     private static function importAttempts(MigrationBuilder $b): void
     {
-        $select = "SELECT result_id, test_id, member_id, COALESCE(NULLIF(final_score, ''), 0) AS grade, status, date_taken, end_time FROM AT_tests_results";
+        $select = "SELECT result_id, test_id, member_id, COALESCE(CAST(NULLIF(final_score, '') AS DECIMAL(5,2)), 0) AS grade, status, date_taken, end_time 
+                FROM AT_tests_results WHERE result_id > :lastId ORDER BY result_id";
 
         $columnMap = [
             'id'          => 'result_id',
@@ -502,11 +463,8 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      */
     private static function importResults(MigrationBuilder $b): void
     {
-        $limit = 10000;
-        $offset = 0;
-
-        self::importNotTextResult($limit, $offset, $b);
-        self::importTextResult($limit, $offset, $b);
+        self::importNotTextResult($b);
+        self::importTextResult($b);
     }
 
     /**
@@ -514,10 +472,12 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
      * @throws Throwable
      * @throws \Yiisoft\Db\Exception\Exception
      */
-    private static function importNotTextResult(int $limit, int $offset, MigrationBuilder $b): void
+    private static function importNotTextResult(MigrationBuilder $b): void
     {
+        $offset = 0;
+
         static $questionAnswerIds = [];
-        $getAnswerIdsByQuestionId = static function (int $questionId, MigrationBuilder $b) use ($questionAnswerIds)
+        $getAnswerIdsByQuestionId = static function (int $questionId, MigrationBuilder $b) use (&$questionAnswerIds)
         {
             if (isset($questionAnswerIds[$questionId])) {
                 return $questionAnswerIds[$questionId];
@@ -538,7 +498,7 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             JOIN AT_tests_questions q ON a.question_id = q.question_id 
                 WHERE q.type IN (1, 2, 7) LIMIT :limit OFFSET :offset") // 1,2,7 - вопросы не требующие проверки текста
                 ->bindValues([
-                    ':limit' => $limit,
+                    ':limit' => self::LIMIT,
                     ':offset' => $offset
                 ])
                 ->queryAll();
@@ -573,28 +533,31 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             }
 
             if (!empty($results)) {
-                $columns = ['attempt_id', 'question_id', 'answer_id'];
-                $b->batchInsert('lms_tests_results', $columns, $results);
+                $b->batchInsert('lms_tests_results', ['attempt_id', 'question_id', 'answer_id'], $results);
             }
 
-            $offset += $limit;
+            $offset += self::LIMIT;
+            echo 'Offset: ' . $offset . PHP_EOL;
         } while (true);
     }
 
     /**
      * @throws InvalidConfigException
+     * @throws NotSupportedException
      * @throws Throwable
      * @throws \Yiisoft\Db\Exception\Exception
      */
-    private static function importTextResult(int $limit, int $offset, MigrationBuilder $b): void
+    private static function importTextResult(MigrationBuilder $b): void
     {
+        $offset = 0;
+
         do {
             $rows = self::getExternalDbConnection()
                 ->createCommand("SELECT result_id, a.question_id, answer, q.* FROM AT_tests_answers a
             JOIN AT_tests_questions q ON a.question_id = q.question_id
                 WHERE q.type NOT IN (1, 2, 3, 4, 7) LIMIT :limit OFFSET :offset") // 1,2,7 - вопросы требующие проверки текста; 3,4 - пропускаем
                 ->bindValues([
-                    ':limit' => $limit,
+                    ':limit' => self::LIMIT,
                     ':offset' => $offset
                 ])
                 ->queryAll();
@@ -606,38 +569,48 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
             $results = [];
             foreach ($rows as $row) {
                 $answerIndexes = explode('|', $row['answer']);
-                $ordering = [];
-                for ($i = 0; $i < 10; $i++) {
-                    $choice = $row["choice_$i"];
 
-                    if (!empty($choice)) {
-                        if ($row['type'] === '6') {
-                            $ordering[] = $row['choice_' . $answerIndexes[$i]];
-                            continue;
+                if ($row['type'] === '6') {
+                    $ordering = [];
+                    for ($i = 0; $i < 10; $i++) {
+                        $choice = $row["choice_$i"];
+
+                        if (!empty($choice)) {
+                            if (isset($answerIndexes[$i]) && $answerIndexes[$i]) {
+                                $answer = (int)$answerIndexes[$i] === -1 ? 'empty' : $row['choice_' . $answerIndexes[$i]];
+                                $ordering[] = $answer;
+                            } else {
+                                $ordering[] = '';
+                            }
                         }
-                        $results[] = [
-                            'attempt_id'  => $row['result_id'],
-                            'question_id' => $row['question_id'],
-                            'answer_text' => $row['option_' . $answerIndexes[$i]] . self::SEPARATOR . $row['choice_' . $i],
-                        ];
                     }
-                }
-
-                if (!empty($ordering)) {
                     $results[] = [
                         'attempt_id'  => $row['result_id'],
                         'question_id' => $row['question_id'],
                         'answer_text' => implode(self::SEPARATOR, $ordering),
                     ];
+                } else {
+                    foreach ($answerIndexes as $i => $value) {
+                        $answer = 'empty';
+
+                        if ($value) {
+                            $answer = (int)$value === -1 ? 'empty' : $row['option_' . $value];
+                        }
+
+                        $results[] = [
+                            'attempt_id'  => $row['result_id'],
+                            'question_id' => $row['question_id'],
+                            'answer_text' => $answer . self::SEPARATOR . $row['choice_' . $i],
+                        ];
+                    }
                 }
             }
 
             if (!empty($results)) {
-                $columns = ['attempt_id', 'question_id', 'answer_text'];
-                $b->batchInsert('lms_tests_results', $columns, $results);
+                $b->batchInsert('lms_tests_results', ['attempt_id', 'question_id', 'answer_text'], $results);
             }
 
-            $offset += $limit;
+            $offset += self::LIMIT;
         } while (true);
     }
 
@@ -651,20 +624,31 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
         string $select,
         string $insertTable,
         array  $columnMap,
-        MigrationBuilder $b
+        MigrationBuilder $b,
+        bool $setOffset = false
     ): void
     {
-        $limit = 10000;
-        $offset = 0;
+        $limit = self::LIMIT;
+        $lastId = 0;
 
         do {
-            $rows = self::getExternalDbConnection()
-                ->createCommand("$select LIMIT :limit OFFSET :offset")
-                ->bindValues([
-                    ":limit" => $limit,
-                    ':offset' => $offset
-                ])
-                ->queryAll();
+            if ($setOffset) {
+                $rows = self::getExternalDbConnection()
+                    ->createCommand("$select LIMIT :limit OFFSET :offset")
+                    ->bindValues([
+                        ':offset' => $lastId,
+                        ':limit' => $limit,
+                    ])
+                    ->queryAll();
+            } else {
+                $rows = self::getExternalDbConnection()
+                    ->createCommand("$select LIMIT :limit")
+                    ->bindValues([
+                        ':lastId' => $lastId,
+                        ':limit' => $limit,
+                    ])
+                    ->queryAll();
+            }
 
             if (empty($rows)) {
                 break;
@@ -680,9 +664,11 @@ final class M251121075219ExtractDataFromDbHub implements RevertibleMigrationInte
                 $insertData[] = $data;
             }
 
+            unset($rows);
+
             $b->batchInsert($insertTable, array_keys($columnMap), $insertData);
 
-            $offset += $limit;
+            $setOffset ? $lastId += self::LIMIT : $lastId = $b->getDb()->getLastInsertID();
         } while (true);
     }
 }

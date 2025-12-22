@@ -45,7 +45,7 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'tree_order' => 'INT        UNSIGNED NOT NULL DEFAULT 0                 COMMENT "Сортировка в ветке"',
         ], 'COMMENT "Контент курсов(учебников)"');
 
-        $b->createIndex('lms_courses', 'lms_courses_course_id', ['course_id']);
+        $b->createIndex('lms_contents', 'lms_contents_course_id', ['course_id']);
 
         $b->createTable('lms_tests', [
             'id'                       => 'INT      UNSIGNED AUTO_INCREMENT PRIMARY KEY         COMMENT "Id теста"',
@@ -82,7 +82,7 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
             'id'          => 'INT        UNSIGNED AUTO_INCREMENT COMMENT "Id вопроса" PRIMARY KEY',
             'course_id'   => 'INT        UNSIGNED NOT NULL       COMMENT "Id курса(учебника)"',
             'category_id' => 'INT        UNSIGNED     NULL       COMMENT "Id категории"',
-            'title'       => 'TEXT                NOT NULL       COMMENT "Название вопроса"',
+            'question'       => 'TEXT                NOT NULL    COMMENT "Вопрос"',
             'type'        => 'TINYINT(1) UNSIGNED NOT NULL       COMMENT "1 - \"Да/Нет\",\n2 - \"Короткий ответ\",\n3 - \"Множ. выбор\",\n4 - \"Множ. ответ\",\n5 - \"Соответствие\",\n6 - \"Сортировка\""',
         ], 'COMMENT "Вопросы теста"');
 
@@ -118,7 +118,7 @@ final class M251030082629CreateLmsTables implements RevertibleMigrationInterface
         $b->createTable('lms_tests_answers', [
             'id'          => 'INT     UNSIGNED AUTO_INCREMENT     COMMENT "Id ответа" PRIMARY KEY',
             'question_id' => 'INT     UNSIGNED NOT NULL           COMMENT "Id вопроса"',
-            'title'       => 'TEXT             NOT NULL           COMMENT "Название ответа"',
+            'answer'       => 'TEXT             NOT NULL           COMMENT "Ответ"',
             'is_correct'  => 'BOOLEAN          NOT NULL DEFAULT 0 COMMENT "0 - не верный/1 - верный"',
         ], 'COMMENT "Ответы на вопросы теста"');
 
