@@ -61,17 +61,17 @@ return [
 			],
 		],
 	],
-	'.REST' => [
+	'lms.Admin.Courses.Tests.Questions.REST' => [
 		'type' => 'segment',
 		'options' => [
-			'route' => '[/[:id]]',
+			'route' => '/lms/api/v1/admin/courses/tests/questions[/[:id]]',
 			'constraints' => [],
 			'defaults' => [
 				'id' => null,
 				'_action' => 'endpointAction',
 				'_actionName' => 'endpoint',
-				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Tests\AttemptController::class,
-				'_controllerDir' => 'r-e-s-t/admin/tests/attempt',
+				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Tests\QuestionOfTestController::class,
+				'_controllerDir' => 'r-e-s-t/admin/tests/question-of-test',
 				'_moduleName' => 'LmsModule',
 			],
 		],
@@ -132,6 +132,36 @@ return [
 				'_actionName' => 'endpoint',
 				'_controller' => Psk\LmsModule\Controllers\REST\User\CourseController::class,
 				'_controllerDir' => 'r-e-s-t/user/course',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
+	'lms.Courses.TestCategories.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '/lms/api/v1/courses/test-categories[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\User\Tests\TestCategoryController::class,
+				'_controllerDir' => 'r-e-s-t/user/tests/test-category',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
+	'lms.Courses.Tests.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '/lms/api/v1/courses/tests[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\User\Tests\TestController::class,
+				'_controllerDir' => 'r-e-s-t/user/tests/test',
 				'_moduleName' => 'LmsModule',
 			],
 		],
