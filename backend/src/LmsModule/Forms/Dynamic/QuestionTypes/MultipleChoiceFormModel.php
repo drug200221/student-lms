@@ -25,9 +25,7 @@ final class MultipleChoiceFormModel extends FormModel
     {
         $this->setAttribute("action", "");
 
-        foreach ((require __DIR__ . '/_baseFields.php')($this) as $field) {
-            $this->add($field);
-        }
+        BaseFields::add($this);
 
         $this->add(
             [

@@ -22,9 +22,7 @@ final class MultipleResponseFormModel extends FormModel
     {
         $this->setAttribute("action", "");
 
-        foreach ((require __DIR__ . '/_baseFields.php')($this) as $field) {
-            $this->add($field);
-        }
+        BaseFields::add($this);
 
         $collection = ElementFactory::factory([
             'type' => CollectionModel::class,

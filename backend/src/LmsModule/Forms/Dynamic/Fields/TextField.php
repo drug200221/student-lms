@@ -11,11 +11,17 @@ use Zend\Validator\Regex;
 
 final class TextField
 {
-    public static function get(string $name = 'text', string $label = 'Текст', bool $continueIfEmpty = true ): array
+    public static function get(
+        string $name = 'text',
+        string $label = 'Текст',
+        bool $required = false,
+        bool $continueIfEmpty = true
+    ): array
     {
         return [
             'name' => $name,
             'options' => [
+                'required' => $required,
                 'continueIfEmpty' => $continueIfEmpty,
                 'label' => $label,
                 'escapeAttr' => false,
