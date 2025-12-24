@@ -40,20 +40,23 @@ module.exports = defineConfig([
           }
         }
       ],
-      'indent': ['error', 2],
-      'semi': ['error', 'always'],
+
+      // Правила для запятых в конце списков (trailing commas)
       'comma-dangle': ['error', {
-        'arrays': 'always-multiline',
-        'objects': 'always-multiline',
-        'imports': 'never',
-        'exports': 'never',
-        'functions': 'never'
+        'arrays': 'always-multiline',   // В массивах ставим запятую, если каждый элемент на новой строке
+        'objects': 'always-multiline',  // В объектах ставим запятую, если свойства на новых строках
+        'imports': 'never',             // В импортах запятая в конце НЕ нужна
+        'exports': 'never',             // В экспортах запятая в конце НЕ нужна
+        'functions': 'never'            // В аргументах функций запятую в конце не ставим
       }],
-      'curly': ['error', 'all'],
-      'brace-style': ['error', '1tbs', {allowSingleLine: true}],
-      'no-multiple-empty-lines': ['error', {max: 1, maxEOF: 0}],
-      'keyword-spacing': ['error', {'before': true, 'after': true}],
-      'space-before-blocks': ['error', 'always'],
+      'indent': ['error', 2], // Размер отступа — 2 пробела
+      'semi': ['error', 'always'], // Точка с запятой обязательна всегда (защищает от ошибок интерпретации JS)
+      'curly': ['error', 'all'], // Фигурные скобки обязательны для всех блоков (if, else, for, while), даже если там одна строка
+      'brace-style': ['error', '1tbs', {allowSingleLine: true}], // Стиль скобок: открывающая на той же строке (1tbs), но можно писать всё в одну строку, если код короткий
+      'no-multiple-empty-lines': ['error', {max: 1, maxEOF: 0}], // Никаких лишних пустых строк: максимум 1 пустая строка подряд
+      'keyword-spacing': ['error', {'before': true, 'after': true}], // Пробелы вокруг ключевых слов
+      'space-before-blocks': ['error', 'always'], // Пробел перед открывающей фигурной скобкой
+      'object-curly-spacing': ['error', 'always'], // Пробелы внутри фигурных скобок
     },
   },
   {

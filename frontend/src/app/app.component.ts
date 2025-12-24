@@ -1,14 +1,11 @@
 import { Component } from '@angular/core';
-import {Button} from 'primeng/button';
 
 @Component({
   selector: 'psk-root',
-  imports: [
-    Button
-  ],
+  imports: [],
   templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
   standalone: true,
-  styleUrl: './app.component.scss'
 })
 export class AppComponent {
 

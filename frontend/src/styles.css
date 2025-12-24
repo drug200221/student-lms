@@ -1,1 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: none; /* Запрет авто-масштабирования текста в Safari */
+  text-size-adjust: none;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased; /* Делаем шрифты более четкими в macOS/iOS */
+  text-rendering: optimizeSpeed;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
