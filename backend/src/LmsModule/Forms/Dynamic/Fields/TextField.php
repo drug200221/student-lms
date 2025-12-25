@@ -4,6 +4,7 @@ namespace Psk\LmsModule\Forms\Dynamic\Fields;
 
 use Ox3a\Form\Model\ElementModel;
 use Psk\LmsModule\Models\Questions\AnswerModel;
+use Zend\Filter\Callback;
 use Zend\Filter\HtmlEntities;
 use Zend\Filter\StringTrim;
 use Zend\Validator\NotEmpty;
@@ -32,6 +33,9 @@ final class TextField
             'filters' => [
                 new HtmlEntities(),
                 new StringTrim(),
+                new Callback(function($value) {
+                    return $value ?? ''; // чтобы Regex не ругался  на null
+                }),
             ],
             'validators' => [
                 new NotEmpty(),
