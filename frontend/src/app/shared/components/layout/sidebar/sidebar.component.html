@@ -1,0 +1,40 @@
+<p-button
+  [icon]="sidebarService.isOpened() ? 'pi pi-chevron-left' : 'pi pi-chevron-right'"
+  (onClick)="sidebarService.toggle()"
+  [rounded]="true"
+  severity="secondary"
+  styleClass="p-button-sm"
+  [style]="{
+      'position': 'fixed',
+      'left': sidebarService.isOpened() ? '7rem' : '0',
+      'top': '3rem',
+      'z-index': '1200'
+  }">
+</p-button>
+
+<p-drawer
+  [visible]="true"
+  [modal]="false"
+  [closable]="false"
+  position="left"
+  [styleClass]="sidebarService.isOpened() ? 'w-8rem' : 'w-1rem'"
+  [pt]="{
+    root: { class: 'border-none' },
+    header: { class: 'flex flex-column align-items-center' },
+    footer: { class: 'flex flex-column align-items-center' }
+  }">
+  @if (sidebarService.isOpened()) {
+    <ng-template #header>
+      <a href="/"><div class="logo-image"></div></a>
+    </ng-template>
+
+    <psk-menu></psk-menu>
+
+    <ng-template #footer>
+      <a href="#">
+        <i [class]="PrimeIcons.SIGN_OUT" class="text-3xl mb-2"></i>
+      </a>
+    </ng-template>
+  }
+</p-drawer>
+

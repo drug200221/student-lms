@@ -9,6 +9,10 @@ html {
   -webkit-text-size-adjust: none; /* Запрет авто-масштабирования текста в Safari */
   text-size-adjust: none;
   scroll-behavior: smooth;
+
+  font-family: "Arimo", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 body {
@@ -22,4 +26,12 @@ body {
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: var(--p-text-muted-color);
+}
+a:hover {
+  color: var(--p-text-color);
 }
