@@ -1,5 +1,14 @@
 <p-toolbar class="border-none border-noround bg-transparent">
   <ng-template #start>
+    @if (!sidebarService.isOpened() || this.sidebarService.isLargeScreen()) {
+      <p-button
+        class="pl-3"
+        [icon]="PrimeIcons.BARS"
+        [text]="true"
+        [rounded]="true"
+        (click)="sidebarService.toggle()"
+      />
+    }
     <p-float-label class="pl-3 text-2xl font-bold">Учебник</p-float-label>
   </ng-template>
 </p-toolbar>

@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Card } from 'primeng/card';
@@ -12,14 +11,15 @@ import { TopbarComponent } from './toolbar/topbar.component';
     RouterOutlet,
     SidebarComponent,
     Card,
-    NgClass,
   ],
   selector: 'psk-layout',
   standalone: true,
   template: `
-    <div class="grid">
-      <psk-sidebar [ngClass]="sidebarService.isOpened() && window.innerWidth > 900 ? 'w-8rem' : 'w-1rem'"></psk-sidebar>
-      <div class="col">
+    <div class="grid m-0">
+      @if (this.sidebarService.isOpened()) {
+        <psk-sidebar class="w-7rem"></psk-sidebar>
+      }
+      <div class="col p-0">
         <psk-toolbar></psk-toolbar>
         <div class="layout-main">
           <p-card class="m-4">
@@ -44,5 +44,4 @@ import { TopbarComponent } from './toolbar/topbar.component';
 })
 export class LayoutComponent {
   public sidebarService = inject(SidebarService);
-  protected readonly window = window;
 }

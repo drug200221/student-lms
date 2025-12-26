@@ -16,8 +16,8 @@ import { MenuItem, PrimeIcons } from 'primeng/api';
         routerLinkActive="text-secondary"
         class="flex flex-column align-items-center text-center p-3"
       >
-        <i [class]="item.icon" class="text-3xl mb-2"></i>
-        <span class="text-xs font-bold uppercase" style="letter-spacing: 0.05rem">
+        <i [class]="item.icon" class="text-2xl mb-2"></i>
+        <span class="text-xs uppercase" style="letter-spacing: 0.05rem">
           {{ item.label }}
         </span>
       </a>
