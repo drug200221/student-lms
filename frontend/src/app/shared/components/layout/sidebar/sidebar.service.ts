@@ -7,8 +7,7 @@ import { debounceTime, fromEvent } from 'rxjs';
 })
 export class SidebarService {
   public isLargeScreen = signal(window.innerWidth >= 920);
-  public isOpened =  signal(window.innerWidth >= 920);
-  public isToggled = signal(false);
+  public isOpened =  signal(this.isLargeScreen());
 
   constructor() {
     fromEvent(window, 'resize')
@@ -21,15 +20,11 @@ export class SidebarService {
         const isLarge = width >= 920;
 
         this.isLargeScreen.set(isLarge);
-
-        if (!this.isToggled()) {
-          this.isOpened.set(isLarge);
-        }
+        this.isOpened.set(isLarge);
       });
   }
 
   public toggle() {
-    this.isToggled.set(true);
     this.isOpened.update(v => !v);
   }
 }
