@@ -1,23 +1,21 @@
 import { Injectable, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, fromEvent } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SidebarService {
-  public isLargeScreen = signal(window.innerWidth >= 920);
+export class SidenavService {
+  public isLargeScreen = signal(window.innerWidth >= 768);
   public isOpened =  signal(this.isLargeScreen());
 
   constructor() {
     fromEvent(window, 'resize')
       .pipe(
-        debounceTime(100),
-        takeUntilDestroyed()
+        debounceTime(100)
       )
       .subscribe(() => {
         const width = window.innerWidth;
-        const isLarge = width >= 920;
+        const isLarge = width >= 768;
 
         this.isLargeScreen.set(isLarge);
         this.isOpened.set(isLarge);

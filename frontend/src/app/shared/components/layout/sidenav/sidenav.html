@@ -1,0 +1,29 @@
+<mat-sidenav-container>
+  <mat-sidenav [opened]="sidenavService.isOpened()" [mode]="sidenavService.isLargeScreen() ? 'side' : 'over'">
+    <mat-tree #tree [childrenAccessor]="childrenAccessor" [dataSource]="dataSource">
+      <mat-menu>
+        <mat-tree-node *matTreeNodeDef="let node">
+          <button [routerLink]=node.link
+                  mat-menu-item>
+            @if (node.icon) {
+              <mat-icon>{{ node.icon }}</mat-icon>
+            }
+            {{ node.title }}
+          </button>
+        </mat-tree-node>
+        <mat-tree-node *matTreeNodeDef="let node; when: hasChild" [cdkTreeNodeTypeaheadLabel]="node.title"
+                       matTreeNodeToggle>
+          <button mat-menu-item>
+            <mat-icon
+              class="mat-icon-rtl-mirror">{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+            </mat-icon>
+            <span [routerLink]=node.link>{{ node.title }}</span>
+          </button>
+        </mat-tree-node>
+      </mat-menu>
+    </mat-tree>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>
