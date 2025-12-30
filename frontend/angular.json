@@ -13,7 +13,6 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "type": "component",
           "style": "scss"
         },
         "@schematics/angular:service": {
@@ -36,7 +35,6 @@
               }
             ],
             "styles": [
-              "node_modules/primeflex/primeflex.css",
               "src/styles.scss"
             ]
           },
