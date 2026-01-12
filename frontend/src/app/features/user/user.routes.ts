@@ -5,7 +5,7 @@ export const UserRoutes: Routes = [
     path: '',
     children: [
       {
-        path: 'admin',
+        path: '',
         children: [
           // { path: 'courses/:courseId/contents/:contentId/edit', component: EditContentComponent },
           // { path: 'courses/:courseId/contents', component: SubSidebarComponent, children: [] },

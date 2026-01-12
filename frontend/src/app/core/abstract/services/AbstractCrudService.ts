@@ -1,22 +1,26 @@
-import { Observable, tap, catchError } from 'rxjs';
+import { Observable, tap, catchError, throwError, Subject } from 'rxjs';
 import { IApiResponse } from '../../interfaces/api-response';
 import { AbstractReadOnlyService } from './AbstractReadOnlyService';
 
 export abstract class AbstractCrudService<T extends { id?: string | number }> extends AbstractReadOnlyService<T> {
+  public readonly itemUpdated$ = new Subject<T>();
+  public readonly itemDeleted$ = new Subject<string | number>();
+
   protected upsertItem(item: T): void {
     const list = this._data();
     const idx = list.findIndex(i => i.id !== undefined && i.id === item.id);
     const next = idx === -1 ? [...list, item] : [...list.slice(0, idx), item, ...list.slice(idx + 1)];
+
     this._data.set(next);
+    this.itemUpdated$.next(item);
   }
 
   protected removeById(id: string | number): void {
     this._data.set(this._data().filter(i => i.id !== id));
+    this.itemDeleted$.next(id);
   }
 
   public create(payload: Partial<T>, optimistic = false): Observable<IApiResponse<T>> {
-    this._error.set(null);
-
     if (optimistic && (payload as T).id !== undefined) {
       this.upsertItem(payload as T);
     }
@@ -27,11 +31,11 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
           this.upsertItem(res.result);
         }
       }),
-      catchError(err => this.handleError(err))
+      catchError(err => throwError(() => err))
     );
   }
+
   public update(id: string | number, changes: Partial<T>, optimistic = false): Observable<IApiResponse<T>> {
-    this._error.set(null);
     const url = `${this.fullUrl}/${id}`;
     let backup: T | undefined;
 
@@ -53,14 +57,12 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
         if (optimistic && backup) {
           this.upsertItem(backup);
         }
-
-        return this.handleError(err);
+        return throwError(() => err);
       })
     );
   }
 
   public delete(id: string | number, optimistic = false): Observable<IApiResponse<void>> {
-    this._error.set(null);
     const url = `${this.fullUrl}/${id}`;
     let backup: T | undefined;
 
@@ -79,12 +81,8 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
         if (optimistic && backup) {
           this.upsertItem(backup);
         }
-
-        return this.handleError(err);
+        return throwError(() => err);
       })
     );
-  }
-  public snapshot(): T[] {
-    return this._data();
   }
 }

@@ -1,0 +1,16 @@
+<mat-toolbar>
+  <button
+    (click)="sidenavService.toggle()"
+    [style.margin-right.rem]="1"
+    mat-icon-button>
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span>{{ courseState.data.value()?.result?.title }}</span>
+
+  <span [style.flex]="'1 1 auto'"></span>
+
+  <button mat-icon-button>
+    <mat-icon>exit_to_app</mat-icon>
+  </button>
+</mat-toolbar>

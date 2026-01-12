@@ -6,7 +6,7 @@ import { debounceTime, fromEvent } from 'rxjs';
 })
 export class SidenavService {
   public isLargeScreen = signal(window.innerWidth >= 768);
-  public isOpened =  signal(this.isLargeScreen());
+  public isOpened = signal(this.isLargeScreen());
 
   constructor() {
     fromEvent(window, 'resize')

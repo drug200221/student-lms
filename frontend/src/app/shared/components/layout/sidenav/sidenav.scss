@@ -3,7 +3,7 @@ mat-sidenav-container {
   margin: 0 auto;
 
   mat-sidenav {
-    width: 16rem;
+    width: fit-content;
     max-width: 24rem;
     height: 100%;
   }

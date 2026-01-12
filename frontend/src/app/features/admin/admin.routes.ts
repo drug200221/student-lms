@@ -5,7 +5,9 @@ export const AdminRoutes: Routes = [
   {
     path: 'courses/:courseId',
     children: [
-      { path: '', component: Test },
+      { path: 'tests', component: Test },
+
+      { path: 'contents/:contentId', component: Content },
     ],
   },
 ];
