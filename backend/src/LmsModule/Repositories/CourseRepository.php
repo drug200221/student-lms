@@ -18,15 +18,15 @@ final class CourseRepository implements ShareServiceInterface
     /** @var CourseMapper */
     private $courseMapper;
 
-    /** @var ContentRepository */
-    private $contentRepository;
+    /** @var ContentNodeRepository */
+    private $contentNodeRepository;
 
     public function __construct(
         CourseMapper $courseMapper,
-        ContentRepository $contentRepository
+        ContentNodeRepository $contentNodeRepository
     ) {
         $this->courseMapper = $courseMapper;
-        $this->contentRepository = $contentRepository;
+        $this->contentNodeRepository = $contentNodeRepository;
     }
 
     /**
@@ -57,7 +57,7 @@ final class CourseRepository implements ShareServiceInterface
             $course = $list[0];
 
             if ($isHydrate) {
-                $contents = $this->contentRepository->findByCourseId($course->getId());
+                $contents = $this->contentNodeRepository->findByCourseId($course->getId());
                 (new CourseHydrator())->hydrateProperty($course, 'contents', $contents);
             }
 

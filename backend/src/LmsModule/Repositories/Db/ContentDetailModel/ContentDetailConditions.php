@@ -4,15 +4,15 @@
  * auto generated
  */
 
-namespace Psk\LmsModule\Repositories\Db\ContentModel;
+namespace Psk\LmsModule\Repositories\Db\ContentDetailModel;
 
 use Ox3a\Core\ConditionsBuilder\Conditions;
 
 /**
- * Class ContentConditions
- * @package Psk\LmsModule\Repositories\Db\ContentModel
+ * Class ContentDetailConditions
+ * @package Psk\LmsModule\Repositories\Db\ContentDetailModel
  */
-class ContentConditions
+class ContentDetailConditions
 {
     /**
      * Порядок сортировки
@@ -55,7 +55,7 @@ class ContentConditions
 
     /**
      * Список дополнительных условий
-     * @var array{ContentConditions, string}[]
+     * @var array{ContentDetailConditions, string}[]
      */
     private $extraConditions = [];
 
@@ -430,11 +430,11 @@ class ContentConditions
 
     /**
      * Добавить дополнительные условия
-     * @param ContentConditions $conditions
+     * @param ContentDetailConditions $conditions
      * @param string $mode
      * @return $this
      */
-    public function addConditions(ContentConditions $conditions, $mode = 'AND')
+    public function addConditions(ContentDetailConditions $conditions, $mode = 'AND')
     {
         $this->extraConditions[] = [$conditions, $mode];
         return $this;

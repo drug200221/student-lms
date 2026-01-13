@@ -4,21 +4,22 @@
  * auto generated
  */
 
-namespace Psk\LmsModule\Repositories\Db\ContentModel;
+namespace Psk\LmsModule\Repositories\Db\ContentNodeModel;
 
 use Ox3a\Core\ConditionsBuilder\ConditionsBuilder;
 use Ox3a\Service\DbServiceInterface;
-use Psk\LmsModule\Models\ContentModel;
+use Psk\LmsModule\Models\ContentNodeModel;
 use ReflectionException;
 use Zend\Db\Sql\Platform\Platform;
+use Zend\Db\Sql\Predicate\Expression;
 use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
 /**
- * Class ContentMapper
- * @package Psk\LmsModule\Repositories\Db\ContentModel
+ * Class ContentNodeMapper
+ * @package Psk\LmsModule\Repositories\Db\ContentNodeModel
  */
-class ContentMapper
+class ContentNodeMapper
 {
     /** @var non-empty-string */
     private $table = 'lms_contents';
@@ -43,33 +44,11 @@ class ContentMapper
     }
 
     /**
-     * Сохранить
-     * @param ContentModel $entity
-     * @return void
-     * @throws ReflectionException
-     */
-    public function save(ContentModel $entity)
-    {
-        $hydrator = $this->getHydrator();
-        $data     = $hydrator->extract($entity);
-
-        $primaryId = $data[$this->primaryKey];
-
-        if ($primaryId) {
-            $this->getTable()->update($data, ["{$this->primaryKey}=?" => $primaryId]);
-        } else {
-            $this->getTable()->insert($data);
-            $primaryId = $this->getTable()->getLastInsertValue();
-            $hydrator->hydrate($entity, [$this->primaryKey => $primaryId]);
-        }
-    }
-
-    /**
      * Найти сущности по условиям
-     * @param ContentConditions $conditions
-     * @return list<ContentModel>
+     * @param ContentNodeConditions $conditions
+     * @return list<ContentNodeModel>
      */
-    public function findBy(ContentConditions $conditions)
+    public function findBy(ContentNodeConditions $conditions)
     {
         $select = $this->getSelect();
 
@@ -97,16 +76,6 @@ class ContentMapper
     }
 
     /**
-     * Удалить
-     * @param int $id
-     * @return void
-     */
-    public function delete($id)
-    {
-        $this->getTable()->delete([$this->primaryKey . '=?' => $id]);
-    }
-
-    /**
      * Получить селект для выборки
      * @return Select
      */
@@ -123,12 +92,7 @@ class ContentMapper
                     'id' => "id",
                     'courseId' => "course_id",
                     'title' => "title",
-                    'content' => "content",
-                    'path' => "path",
                     'parentId' => "parent_id",
-                    'createdAt' => "created_at",
-                    'updatedAt' => "updated_at",
-                    'revision' => "revision",
                     'type' => "type",
                     'treeLevel' => "tree_level",
                     'treeLeft' => "tree_left",
@@ -141,11 +105,11 @@ class ContentMapper
     /**
      * Создать сущность
      * @param array<non-empty-string, mixed> $data
-     * @return ContentModel
+     * @return ContentNodeModel
      */
     public function createEntity($data = [])
     {
-        $entity = new ContentModel();
+        $entity = new ContentNodeModel();
 
         $this->getHydrator()->hydrate($entity, $data);
 
@@ -172,11 +136,11 @@ class ContentMapper
 
     /**
      * Получить гидратор
-     * @return ContentHydrator
+     * @return ContentNodeHydrator
      */
     protected function getHydrator()
     {
-        return new ContentHydrator();
+        return new ContentNodeHydrator();
     }
 
     /**

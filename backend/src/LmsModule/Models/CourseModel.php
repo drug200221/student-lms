@@ -59,7 +59,7 @@ final class CourseModel implements \JsonSerializable
      */
     private $fillProgress = 0;
 
-    /** @var ContentModel[] */
+    /** @var ContentNodeModel[] */
     private $contents = [];
 
     /**

@@ -7,8 +7,8 @@ namespace Psk\LmsModule\Services\REST\Admin;
 use Ox3a\Service\DbService;
 use Psk\LmsModule\Forms\Requests\ContentFormModel;
 use Psk\LmsModule\Helpers\ConflictResult;
-use Psk\LmsModule\Models\ContentModel;
-use Psk\LmsModule\Repositories\ContentRepository;
+use Psk\LmsModule\Models\ContentDetailModel;
+use Psk\LmsModule\Repositories\ContentDetailRepository;
 use Psk\RestModule\RestServiceInterface;
 use Psk\RestModule\Results\AbstractResult;
 use Psk\RestModule\Results\NotFoundResult;
@@ -24,15 +24,15 @@ final class ContentService implements RestServiceInterface
     /** @var ContentFormModel|null */
     private $contentForm;
 
-    /** @var ContentRepository */
+    /** @var ContentDetailRepository */
     private $contentRepository;
 
     /** @var DbService */
     private $dbService;
 
     public function __construct(
-        ContentRepository $contentRepository,
-        DbService         $dbService
+        ContentDetailRepository $contentRepository,
+        DbService               $dbService
     ) {
         $this->contentRepository = $contentRepository;
         $this->dbService         = $dbService;
@@ -82,7 +82,7 @@ final class ContentService implements RestServiceInterface
 
         $request = $form->getDataModel();
 
-        $content = new ContentModel();
+        $content = new ContentDetailModel();
 
         $content
             ->setTitle($request->title)
@@ -145,12 +145,12 @@ final class ContentService implements RestServiceInterface
         }
 
         if ($this->contentRepository->issetChildren($content)) {
-            return new ConflictResult(ContentModel::CHILDREN_EXISTS_ERROR);
+            return new ConflictResult(ContentDetailModel::CHILDREN_EXISTS_ERROR);
         }
 
         $this->contentRepository->delete($content);
 
-        return new SuccessResult(ContentModel::DELETE_SUCCESS);
+        return new SuccessResult(ContentDetailModel::DELETE_SUCCESS);
     }
 
     /**
@@ -165,7 +165,7 @@ final class ContentService implements RestServiceInterface
     }
 
     /**
-     * @param ContentModel[] $contents
+     * @param ContentDetailModel[] $contents
      * @param non-negative-int $parentId
      * @param positive-int $level
      * @param positive-int $counter

@@ -10,7 +10,7 @@ use Ox3a\Annotation\Mapping;
  * @internal
  * @Mapping\Table("lms_contents", alias="cnts")
  */
-final class ContentModel implements \JsonSerializable
+final class ContentDetailModel implements \JsonSerializable
 {
     public const CHILDREN_EXISTS_ERROR = 'Нельзя удалить страницу с дочерними ресурсами.';
     public const DELETE_SUCCESS = 'Контент успешно удален!';
@@ -100,11 +100,6 @@ final class ContentModel implements \JsonSerializable
      * @var non-negative-int
      */
     private $treeOrder = 0;
-
-    /**
-     * @var self[]
-     */
-    private $children = [];
 
     /**
      * @return positive-int
@@ -216,7 +211,7 @@ final class ContentModel implements \JsonSerializable
      * @param \DateTimeImmutable $createdAt
      * @return self
      */
-    public function setCreatedAt(\DateTimeImmutable $createdAt): ContentModel
+    public function setCreatedAt(\DateTimeImmutable $createdAt): ContentDetailModel
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -371,21 +366,20 @@ final class ContentModel implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'id'           => $this->id,
-            'courseId'     => $this->courseId,
-            'title'        => $this->title,
-            'content'      => $this->content,
-            'path'         => $this->path,
-            'parentId'     => $this->parentId,
-            'createdAt'    => $this->createdAt,
-            'updatedAt'    => $this->updatedAt,
-            'revision'     => $this->revision,
-            'type'         => $this->type,
-            'treeLevel'    => $this->treeLevel,
-            'treeLeft'     => $this->treeLeft,
-            'treeRight'    => $this->treeRight,
-            'treeOrder'    => $this->treeOrder,
-            'children'     => $this->children,
+            'id'        => $this->id,
+            'courseId'  => $this->courseId,
+            'title'     => $this->title,
+            'content'   => $this->content,
+            'path'      => $this->path,
+            'parentId'  => $this->parentId,
+            'createdAt' => $this->createdAt,
+            'updatedAt' => $this->updatedAt,
+            'revision'  => $this->revision,
+            'type'      => $this->type,
+            'treeLevel' => $this->treeLevel,
+            'treeLeft'  => $this->treeLeft,
+            'treeRight' => $this->treeRight,
+            'treeOrder' => $this->treeOrder,
         ];
     }
 }

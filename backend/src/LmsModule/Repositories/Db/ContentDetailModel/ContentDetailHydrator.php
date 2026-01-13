@@ -4,25 +4,25 @@
  * auto generated
  */
 
-namespace Psk\LmsModule\Repositories\Db\ContentModel;
+namespace Psk\LmsModule\Repositories\Db\ContentDetailModel;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use Psk\LmsModule\Models\ContentModel;
+use Psk\LmsModule\Models\ContentDetailModel;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 
 /**
- * Class ContentHydrator
- * @package Psk\LmsModule\Repositories\Db\ContentModel
+ * Class ContentDetailHydrator
+ * @package Psk\LmsModule\Repositories\Db\ContentDetailModel
  */
-class ContentHydrator
+class ContentDetailHydrator
 {
     /** @var array<non-empty-string, ReflectionProperty> */
     private static $propertyReflections = [];
 
-    /** @var ReflectionClass<ContentModel>|null */
+    /** @var ReflectionClass<ContentDetailModel>|null */
     private static $classReflection;
 
     /**
@@ -66,20 +66,20 @@ class ContentHydrator
     }
 
     /**
-     * @return ReflectionClass<ContentModel>
+     * @return ReflectionClass<ContentDetailModel>
      */
     private static function getReflectionClass()
     {
-        return self::$classReflection ?: self::$classReflection = new ReflectionClass(ContentModel::class);
+        return self::$classReflection ?: self::$classReflection = new ReflectionClass(ContentDetailModel::class);
     }
 
     /**
      * Заполнить объект данными
-     * @param ContentModel $object
+     * @param ContentDetailModel $object
      * @param array<non-empty-string, mixed> $data
-     * @return ContentModel
+     * @return ContentDetailModel
      */
-    public function hydrate(ContentModel $object, array $data)
+    public function hydrate(ContentDetailModel $object, array $data)
     {
         foreach ($this->map as $property => $settings) {
             if (array_key_exists($property, $data)) {
@@ -95,11 +95,11 @@ class ContentHydrator
 
     /**
      * Извлечь данные из объекта
-     * @param ContentModel $object
+     * @param ContentDetailModel $object
      * @return array<non-empty-string, mixed>
      * @throws ReflectionException
      */
-    public function extract(ContentModel $object)
+    public function extract(ContentDetailModel $object)
     {
         $dbData = [];
 
@@ -115,25 +115,25 @@ class ContentHydrator
 
     /**
      * Заполнить данными свойство объекта
-     * @param ContentModel $object
+     * @param ContentDetailModel $object
      * @param non-empty-string $property
      * @param mixed $value
      * @return void
      * @throws ReflectionException
      */
-    public function hydrateProperty(ContentModel $object, $property, $value)
+    public function hydrateProperty(ContentDetailModel $object, $property, $value)
     {
         self::getReflectionProperty($property)->setValue($object, $value);
     }
 
     /**
      * Извлечь данные из свойства объекта
-     * @param ContentModel $object
+     * @param ContentDetailModel $object
      * @param non-empty-string $property
      * @return mixed
      * @throws ReflectionException
      */
-    public function extractProperty(ContentModel $object, $property)
+    public function extractProperty(ContentDetailModel $object, $property)
     {
         return self::getReflectionProperty($property)->getValue($object);
     }
