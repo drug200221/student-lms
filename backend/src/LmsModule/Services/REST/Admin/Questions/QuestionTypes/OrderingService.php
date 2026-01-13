@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Psk\LmsModule\Services\QuestionTypes;
+namespace Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes;
 
+use Psk\LmsModule\Models\Questions\AnswerModel;
 use Psk\LmsModule\Models\Questions\QuestionModel;
 use Psk\LmsModule\Models\Requests\Questions\Types\MultiAnswerRequestModel;
-use Psk\LmsModule\Repositories\Db\Questions\QuestionModel\QuestionHydrator;
 use Psk\RestModule\Results\AbstractResult;
 use Psk\RestModule\Results\NotFoundResult;
 use Psk\RestModule\Results\SuccessResult;
@@ -15,7 +15,7 @@ use Psk\RestModule\Results\ValidationErrorsResult;
 /**
  * @internal
  */
-final class MultipleResponseService extends AbstractQuestionTypesService
+final class OrderingService extends AbstractQuestionTypesService
 {
     /**
      * @param array<string,mixed> $data
@@ -34,12 +34,12 @@ final class MultipleResponseService extends AbstractQuestionTypesService
 
         $this->updateByRequest($question, $form->getDataModel());
 
-        return new SuccessResult($question);
+        return new SuccessResult($this->questionRepository->findById($question->getId()));
     }
 
     /**
      * @param QuestionModel $question
-     * @param array $data
+     * @param array<string,mixed> $data
      * @return NotFoundResult|SuccessResult|ValidationErrorsResult
      * @throws \ReflectionException
      */
@@ -53,7 +53,7 @@ final class MultipleResponseService extends AbstractQuestionTypesService
 
         $this->updateByRequest($question, $form->getDataModel());
 
-        return new SuccessResult($question);
+        return new SuccessResult($this->questionRepository->findById($question->getId()));
     }
 
     /**
@@ -62,24 +62,14 @@ final class MultipleResponseService extends AbstractQuestionTypesService
      * @return void
      * @throws \ReflectionException
      */
-    private function updateByRequest(
-        QuestionModel              $question,
-        MultiAnswerRequestModel $request
-    ): void
+    private function updateByRequest(QuestionModel $question, MultiAnswerRequestModel $request): void
     {
         $this->questionRepository->setAndSave($question, $request);
 
-        $answers = $this->questionRepository->balanceAnswers($question, count($request->answers));
+        $answer = $this->questionRepository->balanceAnswers($question, 1)[0];
 
-        foreach ($answers as $number => $answer) {
-            $this->answerRepository->setAndSave(
-                $answer,
-                $question->getId(),
-                $request->answers[$number]['text'],
-                $request->answers[$number]['isCorrect']);
-        }
+        $concat = implode(AnswerModel::SEPARATOR, array_column($request->answers, 'position'));
 
-        $hydrator = new QuestionHydrator();
-        $hydrator->hydrateProperty($question, 'answers', $answers);
+        $this->answerRepository->setAndSave($answer, $question->getId(), $concat, true);
     }
 }

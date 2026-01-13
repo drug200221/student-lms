@@ -8,12 +8,12 @@ use Psk\LmsModule\Helpers\ConflictResult;
 use Psk\LmsModule\Models\Questions\QuestionModel;
 use Psk\LmsModule\Repositories\Questions\QuestionRepository;
 use Psk\LmsModule\Repositories\Tests\ResultRepository;
-use Psk\LmsModule\Services\QuestionTypes\AccordanceService;
-use Psk\LmsModule\Services\QuestionTypes\MultipleChoiceService;
-use Psk\LmsModule\Services\QuestionTypes\MultipleResponseService;
-use Psk\LmsModule\Services\QuestionTypes\OrderingService;
-use Psk\LmsModule\Services\QuestionTypes\ShortResponseService;
-use Psk\LmsModule\Services\QuestionTypes\TrueOrFalseService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\AccordanceService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\MultipleChoiceService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\MultipleResponseService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\OrderingService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\ShortResponseService;
+use Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes\TrueOrFalseService;
 use Psk\RestModule\RestServiceInterface;
 use Psk\RestModule\Results\AbstractResult;
 use Psk\RestModule\Results\InternalServerErrorResult;
@@ -73,7 +73,7 @@ final class QuestionService implements RestServiceInterface
 
     /**
      * @param array<string,mixed> $params
-     * @return SuccessResult|void
+     * @return AbstractResult
      */
     public function find($params): AbstractResult
     {
@@ -82,7 +82,7 @@ final class QuestionService implements RestServiceInterface
 
     /**
      * @param positive-int $id
-     * @return NotFoundResult|SuccessResult
+     * @return AbstractResult
      * @throws \ReflectionException
      */
     public function get($id): AbstractResult
@@ -119,7 +119,7 @@ final class QuestionService implements RestServiceInterface
     /**
      * @param positive-int $id
      * @param array<string,mixed> $data
-     * @return NotFoundResult|SuccessResult|ValidationErrorsResult
+     * @return AbstractResult
      * @throws \ReflectionException
      */
     public function update($id, $data): AbstractResult

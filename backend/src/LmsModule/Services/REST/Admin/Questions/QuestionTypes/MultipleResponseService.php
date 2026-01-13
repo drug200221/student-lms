@@ -1,27 +1,28 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace Psk\LmsModule\Services\QuestionTypes;
+namespace Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes;
 
 use Psk\LmsModule\Models\Questions\QuestionModel;
 use Psk\LmsModule\Models\Requests\Questions\Types\MultiAnswerRequestModel;
 use Psk\LmsModule\Repositories\Db\Questions\QuestionModel\QuestionHydrator;
 use Psk\RestModule\Results\AbstractResult;
+use Psk\RestModule\Results\NotFoundResult;
 use Psk\RestModule\Results\SuccessResult;
 use Psk\RestModule\Results\ValidationErrorsResult;
 
 /**
  * @internal
  */
-final class ShortResponseService extends AbstractQuestionTypesService
+final class MultipleResponseService extends AbstractQuestionTypesService
 {
     /**
      * @param array<string,mixed> $data
      * @return SuccessResult|ValidationErrorsResult
      * @throws \ReflectionException
      */
-    public function create($data): AbstractResult
+    public function create(array $data): AbstractResult
     {
         $form = $this->questionTypeFormFactories->initializeForm($data);
 
@@ -36,14 +37,13 @@ final class ShortResponseService extends AbstractQuestionTypesService
         return new SuccessResult($question);
     }
 
-
     /**
      * @param QuestionModel $question
-     * @param array<string,mixed> $data
-     * @return AbstractResult
+     * @param array $data
+     * @return NotFoundResult|SuccessResult|ValidationErrorsResult
      * @throws \ReflectionException
      */
-    public function update(QuestionModel $question, $data): AbstractResult
+    public function update(QuestionModel $question, array $data): AbstractResult
     {
         $form = $this->questionTypeFormFactories->initializeForm($data);
 
@@ -63,7 +63,7 @@ final class ShortResponseService extends AbstractQuestionTypesService
      * @throws \ReflectionException
      */
     private function updateByRequest(
-        QuestionModel             $question,
+        QuestionModel              $question,
         MultiAnswerRequestModel $request
     ): void
     {
@@ -76,7 +76,7 @@ final class ShortResponseService extends AbstractQuestionTypesService
                 $answer,
                 $question->getId(),
                 $request->answers[$number]['text'],
-                true);
+                $request->answers[$number]['isCorrect']);
         }
 
         $hydrator = new QuestionHydrator();

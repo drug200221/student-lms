@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Psk\LmsModule\Services\QuestionTypes;
+namespace Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes;
 
 use Psk\LmsModule\Models\Questions\AnswerModel;
 use Psk\LmsModule\Models\Questions\QuestionModel;
@@ -15,7 +15,7 @@ use Psk\RestModule\Results\ValidationErrorsResult;
 /**
  * @internal
  */
-final class OrderingService extends AbstractQuestionTypesService
+final class AccordanceService extends AbstractQuestionTypesService
 {
     /**
      * @param array<string,mixed> $data
@@ -66,10 +66,12 @@ final class OrderingService extends AbstractQuestionTypesService
     {
         $this->questionRepository->setAndSave($question, $request);
 
-        $answer = $this->questionRepository->balanceAnswers($question, 1)[0];
+        $answers = $this->questionRepository->balanceAnswers($question, count($request->answers));
 
-        $concat = implode(AnswerModel::SEPARATOR, array_column($request->answers, 'position'));
+        foreach ($answers as $number => $answer) {
+            $concat =  $request->answers[$number]['left'] . AnswerModel::SEPARATOR . $request->answers[$number]['right'];
 
-        $this->answerRepository->setAndSave($answer, $question->getId(), $concat, true);
+            $this->answerRepository->setAndSave($answer, $question->getId(), $concat, true);
+        }
     }
 }

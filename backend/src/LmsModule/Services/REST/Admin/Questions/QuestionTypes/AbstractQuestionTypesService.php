@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Psk\LmsModule\Services\QuestionTypes;
+namespace Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes;
 
 use Psk\LmsModule\Forms\Factories\QuestionTypeFormFactories;
 use Psk\LmsModule\Models\Questions\QuestionModel;

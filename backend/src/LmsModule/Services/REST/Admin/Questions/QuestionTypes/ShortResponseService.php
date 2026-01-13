@@ -1,11 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
-namespace Psk\LmsModule\Services\QuestionTypes;
+namespace Psk\LmsModule\Services\REST\Admin\Questions\QuestionTypes;
 
 use Psk\LmsModule\Models\Questions\QuestionModel;
-use Psk\LmsModule\Models\Requests\Questions\Types\MultipleChoiceRequestModel;
+use Psk\LmsModule\Models\Requests\Questions\Types\MultiAnswerRequestModel;
 use Psk\LmsModule\Repositories\Db\Questions\QuestionModel\QuestionHydrator;
 use Psk\RestModule\Results\AbstractResult;
 use Psk\RestModule\Results\SuccessResult;
@@ -14,11 +14,11 @@ use Psk\RestModule\Results\ValidationErrorsResult;
 /**
  * @internal
  */
-final class MultipleChoiceService extends AbstractQuestionTypesService
+final class ShortResponseService extends AbstractQuestionTypesService
 {
     /**
      * @param array<string,mixed> $data
-     * @return AbstractResult
+     * @return SuccessResult|ValidationErrorsResult
      * @throws \ReflectionException
      */
     public function create($data): AbstractResult
@@ -35,6 +35,7 @@ final class MultipleChoiceService extends AbstractQuestionTypesService
 
         return new SuccessResult($question);
     }
+
 
     /**
      * @param QuestionModel $question
@@ -57,13 +58,13 @@ final class MultipleChoiceService extends AbstractQuestionTypesService
 
     /**
      * @param QuestionModel $question
-     * @param MultipleChoiceRequestModel $request
+     * @param MultiAnswerRequestModel $request
      * @return void
      * @throws \ReflectionException
      */
     private function updateByRequest(
-        QuestionModel              $question,
-        MultipleChoiceRequestModel $request
+        QuestionModel             $question,
+        MultiAnswerRequestModel $request
     ): void
     {
         $this->questionRepository->setAndSave($question, $request);
@@ -75,7 +76,7 @@ final class MultipleChoiceService extends AbstractQuestionTypesService
                 $answer,
                 $question->getId(),
                 $request->answers[$number]['text'],
-                $request->correct === $number);
+                true);
         }
 
         $hydrator = new QuestionHydrator();
