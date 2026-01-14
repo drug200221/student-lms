@@ -83,6 +83,9 @@ class ContentFormModel extends FormModel
                     new \Zend\Filter\HtmlEntities(),
                     new \Zend\Filter\StringTrim(),
                 ],
+                'validators' => [
+                    new \Zend\Validator\StringLength(["max" => 65535]),
+                ],
                 'type' => \Ox3a\Form\Model\ElementModel::class,
             ]
         );

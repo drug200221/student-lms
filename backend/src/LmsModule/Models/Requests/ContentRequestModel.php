@@ -45,6 +45,7 @@ class ContentRequestModel
     /**
      * @Form\Element(label="Контент")
      * @Form\Attribute(false, name="escapeAttr")
+     * @Form\Validator(@Form\Validator\LengthValidator(max=65535))
      * @Form\Filter(@Form\Filter\HtmlEntitiesFilter())
      * @Form\Filter(@Form\Filter\TrimFilter())
      * @var string
