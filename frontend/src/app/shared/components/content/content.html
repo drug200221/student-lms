@@ -1,0 +1,23 @@
+<mat-card>
+  @if (content(); as data) {
+    <mat-card-header>
+      <mat-card-title>
+        <h2>{{ data.title }}</h2>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      <markdown
+        [data]="data.content"
+        clipboard
+        emoji>
+      </markdown>
+    </mat-card-content>
+  } @else {
+    <mat-card-content>
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+  }
+</mat-card>

@@ -47,7 +47,7 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
       }
     }
 
-    return this.http.patch<IApiResponse<T>>(url, changes).pipe(
+    return this.http.put<IApiResponse<T>>(url, changes, { responseType: 'text' as 'json' }).pipe(
       tap(res => {
         if (res.success && res.result) {
           this.upsertItem(res.result);

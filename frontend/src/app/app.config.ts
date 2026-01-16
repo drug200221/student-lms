@@ -1,10 +1,10 @@
-import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import {
   ApplicationConfig,
   importProvidersFrom, inject, InjectionToken,
   LOCALE_ID,
   provideBrowserGlobalErrorListeners, Type
 } from '@angular/core';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { NgxEditorModule } from 'ngx-editor';
 import { CLIPBOARD_OPTIONS, ClipboardButtonComponent, provideMarkdown } from 'ngx-markdown';

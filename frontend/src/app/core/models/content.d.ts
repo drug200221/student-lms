@@ -9,6 +9,23 @@ export interface ICourseContent {
   courseId: number;
   parentId: number;
   title: string;
+
+  /** @deprecated */
+  type: ContentType;
+
+  treeLevel: number;
+  treeLeft: number;
+  treeRight: number;
+  treeOrder: number;
+
+  children: ICourseContent[];
+}
+
+export interface IContent {
+  id: number;
+  courseId: number;
+  parentId: number;
+  title: string;
   content: string | null;
   path: string | null;
   revision: number;
@@ -23,8 +40,6 @@ export interface ICourseContent {
   treeLeft: number;
   treeRight: number;
   treeOrder: number;
-
-  children: ICourseContent[];
 }
 
 export namespace ContentDto {
