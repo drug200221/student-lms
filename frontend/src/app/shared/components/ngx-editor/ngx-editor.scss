@@ -1,0 +1,195 @@
+@use "@angular/material" as mat;
+
+psk-ngx-editor {
+  ngx-editor {
+    font-family: "Arimo", sans-serif;
+
+    /* Поле ввода */
+    .NgxEditor {
+      background-color: var(--mat-sys-surface);
+      color: var(--mat-sys-on-surface);
+      border: 1px solid var(--mat-sys-outline);
+      padding: 0 1rem;
+      overflow: auto;
+
+      .NgxEditor__Content {
+        max-height: 650px;
+        padding: 1rem 0 0.25rem 0;
+        word-break: break-word;
+
+        .NgxEditor__Placeholder:before {
+          color: var(--mat-sys-on-surface);
+        }
+      }
+
+      &:hover {
+        border: 1px solid var(--mat-sys-on-surface);
+      }
+
+      &:focus-within {
+        outline: none;
+        border: 2px solid var(--mat-sys-primary);
+      }
+    }
+  }
+
+  .invalid-editor {
+    .NgxEditor {
+      border: 1px solid var(--mat-sys-error);
+
+      .NgxEditor__Content {
+        .NgxEditor__Placeholder:before {
+          color: var(--mat-sys-error);
+        }
+      }
+
+      &:hover {
+        border-color: var(--mat-sys-on-error-container);
+
+        .NgxEditor__Content .NgxEditor__Placeholder:before {
+          color: var(--mat-sys-on-error-container);
+        }
+      }
+
+      &:focus-within {
+        outline: none;
+        border: 2px solid var(--mat-sys-error);
+
+        .NgxEditor__Content .NgxEditor__Placeholder:before {
+          color: var(--mat-sys-error);
+        }
+      }
+    }
+  }
+
+  ngx-editor-menu {
+    /* Панель меню */
+    .NgxEditor__MenuBar {
+      background-color: var(--mat-sys-surface);
+
+      .NgxEditor__MenuItem--IconContainer {
+        .NgxEditor__Popup {
+          background-color: var(--mat-sys-surface-bright);
+          color: var(--mat-sys-on-surface);
+          box-shadow: var(--mat-sys-level1);
+          border-radius: var(--mat-sys-corner-extra-small);
+
+          .NgxEditor__HelpText--Error {
+            color: var(--mat-sys-error);
+          }
+
+          label {
+            font-size: 0.8rem;
+          }
+
+          input {
+            background-color: var(--mat-sys-surface-container-low); // Контраст на фоне bright
+            color: var(--mat-sys-on-surface);
+            border: 1px solid var(--mat-sys-outline);
+            border-radius: var(--mat-sys-corner-extra-small);
+            padding: 0.3rem;
+            font-size: 0.8rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+
+            &::placeholder {
+              color: var(--mat-sys-on-surface-variant);
+              opacity: 0.7;
+            }
+
+            &:focus {
+              outline: none;
+              border-color: var(--mat-sys-primary);
+              box-shadow: 0 0 0 1px var(--mat-sys-primary);
+            }
+          }
+
+          button {
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.8rem;
+            padding: 0.5rem;
+            border: none;
+            border-radius: var(--mat-sys-corner-full);
+            transition: background-color 0.2s, transform 0.1s;
+
+            background-color: var(--mat-sys-primary);
+            color: var(--mat-sys-on-primary);
+
+            &:hover {
+              background-color: color-mix(in srgb, var(--mat-sys-primary), white 10%);
+              box-shadow: var(--mat-sys-level1);
+            }
+
+            &:active {
+              transform: scale(0.98);
+            }
+
+            &:disabled {
+              background-color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 12%);
+              color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 60%);
+              box-shadow: none;
+              border: none;
+              cursor: default;
+              pointer-events: none;
+              outline: none;
+            }
+          }
+        }
+      }
+
+      .NgxEditor__MenuItem--Icon {
+        fill: var(--mat-sys-on-surface);
+
+        &:hover {
+          background-color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 8%);
+        }
+
+        &.NgxEditor__MenuItem--Active {
+          background-color: var(--mat-sys-secondary-container);
+          color: var(--mat-sys-primary);
+          fill: var(--mat-sys-secondary-container);
+        }
+
+        &.NgxEditor__MenuItem--Disabled {
+          fill: var(--mat-sys-outline);
+        }
+      }
+    }
+
+    /* Всплывающие окна (формы ссылок, заголовков) */
+    .NgxEditor__Dropdown {
+      &:hover {
+        background-color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 8%);
+      }
+
+      .NgxEditor__Dropdown--Selected {
+        background-color: var(--mat-sys-secondary-container);
+        color: var(--mat-sys-primary);
+        fill: var(--mat-sys-on-secondary-container);
+      }
+
+      .NgxEditor__Dropdown--DropdownMenu {
+        background-color: var(--mat-sys-surface-bright);
+        color: var(--mat-sys-on-surface);
+        box-shadow: var(--mat-sys-level1);
+        border-radius: var(--mat-sys-corner-extra-small);
+
+        .NgxEditor__Dropdown--Item {
+          &:hover {
+            background-color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 8%);
+          }
+        }
+
+        .NgxEditor__Dropdown--Active {
+          background-color: color-mix(in srgb, transparent, var(--mat-sys-on-surface) 8%);
+        }
+      }
+    }
+  }
+
+  /* Плавающее меню (Floating Menu) */
+  ngx-editor-floating-menu {
+    box-shadow: var(--mat-sys-level5);
+  }
+}
