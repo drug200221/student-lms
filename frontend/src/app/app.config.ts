@@ -9,6 +9,12 @@ import { provideRouter, withRouterConfig } from '@angular/router';
 import { NgxEditorModule } from 'ngx-editor';
 import { CLIPBOARD_OPTIONS, ClipboardButtonComponent, provideMarkdown } from 'ngx-markdown';
 import { routes } from './app.routes';
+import { CONTENT_SERVICE_TOKEN, COURSE_SERVICE_TOKEN } from './core/service-tokens';
+import { AuthService } from './core/services/auth.service';
+import { CourseService as AdminCourseService } from './features/admin/services/course.service';
+import { CourseService as UserCourseService } from './features/user/services/course.service';
+import { ContentService as AdminContentService } from './features/admin/services/content.service';
+import { ContentService as UserContentService } from './features/user/services/content.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -65,5 +71,23 @@ export const appConfig: ApplicationConfig = {
       provide: LOCALE_ID,
       useValue: 'ru-RU',
     },
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'outline' },
+    },
+
+    provideByRole(COURSE_SERVICE_TOKEN, AdminCourseService, UserCourseService),
+    provideByRole(CONTENT_SERVICE_TOKEN, AdminContentService, UserContentService),
   ],
 };
+
+function provideByRole<T>(
+  token: InjectionToken<T>,
+  adminService: Type<T>,
+  userService: Type<T>
+) {
+  return {
+    provide: token,
+    useFactory: () => inject(AuthService).isAdmin() ? inject(adminService) : inject(userService),
+  };
+}
