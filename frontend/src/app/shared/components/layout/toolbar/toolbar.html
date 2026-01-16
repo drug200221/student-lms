@@ -1,12 +1,12 @@
 <mat-toolbar>
   <button
-    (click)="sidenavService.toggle()"
+    (click)="sidenavService.toggleLeft()"
     [style.margin-right.rem]="1"
     mat-icon-button>
     <mat-icon>menu</mat-icon>
   </button>
 
-  <span>{{ courseState.data.value()?.result?.title }}</span>
+  {{ courseState.data.value()?.result?.title }}
 
   <span [style.flex]="'1 1 auto'"></span>
 

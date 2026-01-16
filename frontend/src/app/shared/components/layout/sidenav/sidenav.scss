@@ -6,10 +6,19 @@ mat-sidenav-container {
     width: fit-content;
     max-width: 24rem;
     height: 100%;
+
+    mat-tree {
+      mat-tree-node {
+        .node {
+          flex-grow: 1;
+          justify-content: flex-start;
+        }
+      }
+    }
   }
 
   mat-sidenav-content {
     height: 100%;
-    padding: 1rem;
+    padding: 0 1rem 1rem;
   }
 }

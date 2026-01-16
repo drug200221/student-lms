@@ -1,30 +1,28 @@
 <mat-sidenav-container>
-  <mat-sidenav [opened]="sidenavService.isOpened()" [mode]="sidenavService.isLargeScreen() ? 'side' : 'over'">
+  <mat-sidenav [opened]="sidenavService.isLeftOpened()" [mode]="sidenavService.leftMode()">
     <mat-tree #tree [childrenAccessor]="childrenAccessor" [dataSource]="dataSource">
-      <mat-menu>
-        <mat-tree-node matTreeNodePadding
-                       matTreeNodePaddingIndent="1.2rem"
-                       *matTreeNodeDef="let node">
-          <button mat-menu-item [routerLink]="node.route">
-            {{ node.route }}
-            @if (node.icon) {
-              <mat-icon>{{ node.icon }}</mat-icon>
-            }
-            {{ node.title }}
-          </button>
-        </mat-tree-node>
-        <mat-tree-node matTreeNodePadding
-                       matTreeNodePaddingIndent="1rem"
-                       matTreeNodeToggle
-                       *matTreeNodeDef="let node; when: hasChild" [cdkTreeNodeTypeaheadLabel]="node.title">
-          <button mat-menu-item>
-            <mat-icon
-              class="mat-icon-rtl-mirror">{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
-            </mat-icon>
-            <span [routerLink]=node.route>{{ node.title }}</span>
-          </button>
-        </mat-tree-node>
-      </mat-menu>
+      <mat-tree-node matTreeNodePadding matTreeNodePaddingIndent="1.7rem"
+                     *matTreeNodeDef="let node">
+        <button class="node default-color" matButton [routerLink]="node.route">
+          @if (node.icon) {
+            <mat-icon>{{ node.icon }}</mat-icon>
+          }
+          {{ node.title }}
+        </button>
+      </mat-tree-node>
+      <mat-tree-node matTreeNodePadding
+                     matTreeNodePaddingIndent="1rem"
+                     *matTreeNodeDef="let node; when: hasChild" [cdkTreeNodeTypeaheadLabel]="node.title">
+        <button matIconButton matTreeNodeToggle>
+          <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+        </button>
+        <button class="node default-color" matButton [routerLink]="node.route">
+          @if (node.icon) {
+            <mat-icon>{{ node.icon }}</mat-icon>
+          }
+          {{ node.title }}
+        </button>
+      </mat-tree-node>
     </mat-tree>
   </mat-sidenav>
   <mat-sidenav-content>
