@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Psk\LmsModule\Services\REST\Admin;
 
+use Ox3a\Form\Validator\DigitsValidator;
 use Ox3a\Service\DbService;
 use Psk\LmsModule\Forms\Requests\ContentFormModel;
 use Psk\LmsModule\Helpers\ConflictResult;
@@ -102,6 +103,7 @@ final class ContentService implements RestServiceInterface
      * @param positive-int $id
      * @param array<string,mixed> $data
      * @return NotFoundResult|SuccessResult|ValidationErrorsResult
+     * @throws \ReflectionException
      */
     public function update($id, $data): AbstractResult
     {
@@ -111,7 +113,17 @@ final class ContentService implements RestServiceInterface
             return new NotFoundResult();
         }
 
+        if (!isset($data['parentId'])) {
+            $data['parentId'] = $content->getParentId();
+        }
+
         $form = $this->getForm($data);
+
+        if ($content->getParentId() === $data['parentId'])
+        {
+            $form->getElement('parentId')->setAttribute('required', false);
+            $form->getElement('parentId')->setValidators([new DigitsValidator()]);
+        }
 
         if (!$form->setData($data)->isValid()) {
             return new ValidationErrorsResult($form->getMessages());
@@ -122,12 +134,11 @@ final class ContentService implements RestServiceInterface
         $content
             ->setTitle($request->title)
             ->setContent($request->content)
+            ->setParentId($request->parentId)
             ->setUpdatedAt(new \DateTimeImmutable())
             ->setRevision($content->getRevision() + 1);
 
-        if ($request->parentId) {
-            $content->setParentId($request->parentId);
-        }
+        $this->contentRepository->save($content);
 
         return new SuccessResult($content);
     }
@@ -195,30 +206,27 @@ final class ContentService implements RestServiceInterface
      */
     private function getForm(array $data): ContentFormModel
     {
-        $select1 = (new Select())
-            ->from('lms_contents')
-            ->columns(['parentId' => 'id'])
+        // Для истории почему такой запрос: Zend\Db\Validator проверяет по первому переданному параметру в условие
+        // !!! Важно в первом условии значение первого параметра всегда должно быть значением поля формы к которому привязан валидатор
+
+        $select = (new Select())
+            ->from(['lc' => 'lms_courses'])
+            ->columns(['parentId' => new \Zend\Db\Sql\Expression('?', [$data['parentId']])])
             ->where([
-                'course_id' => $data['courseId'],
-                'id' => $data['parentId']
-            ])
-            ->where(new \Zend\Db\Sql\Predicate\Expression(
-                'EXISTS (SELECT 1 FROM lms_courses WHERE id = ?)',
-                [$data['courseId']]
-            ));
+                new \Zend\Db\Sql\Predicate\Expression('(:where1 IS NOT NULL)', []),
+                'lc.id' => $data['courseId']
+            ]);
 
-        $select2 = (new Select())
-            ->columns(['parentId' => new \Zend\Db\Sql\Expression('0')])
-            ->where(new \Zend\Db\Sql\Predicate\Expression(
-                'EXISTS (SELECT 1 FROM lms_courses WHERE id = ?) AND ? = 0',
-                [$data['courseId'], $data['parentId']]
+        if ($data['parentId'] != 0) {
+            $select->where(new \Zend\Db\Sql\Predicate\Expression(
+                'EXISTS (SELECT 1 FROM lms_contents WHERE id = ? AND course_id = lc.id)',
+                [$data['parentId']]
             ));
-
-        $unionSelect = $select1->combine($select2, Select::COMBINE_UNION, Select::QUANTIFIER_ALL);
+        }
 
         return $this->contentForm ?: ($this->contentForm = new ContentFormModel(null, [
             'db' => $this->dbService,
-            'selectExists' => $unionSelect,
+            'selectExists' => $select,
         ]));
     }
 }
