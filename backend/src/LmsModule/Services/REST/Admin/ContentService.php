@@ -210,20 +210,24 @@ final class ContentService implements RestServiceInterface
         // !!! Важно в первом условии значение первого параметра всегда должно быть значением поля формы к которому привязан валидатор
 
         $select = (new Select())
-            ->from(['lc' => 'lms_courses'])
-            ->columns(['parentId' => new \Zend\Db\Sql\Expression('?', [$data['parentId']])])
+            ->from(['lc' => 'lms_contents'])
+            ->columns(['parentId' => new \Zend\Db\Sql\Expression(
+                $data['parentId'] == 0 ? '0' : 'lc.id'
+            )])
             ->where([
-                new \Zend\Db\Sql\Predicate\Expression('(:where1 IS NOT NULL)', []),
-                'lc.id' => $data['courseId']
-            ]);
+                new \Zend\Db\Sql\Predicate\PredicateSet([
+                    new \Zend\Db\Sql\Predicate\Operator('lc.id', '=', $data['parentId']),
+                    new \Zend\Db\Sql\Predicate\Expression('? = 0', $data['parentId'])
+                ], \Zend\Db\Sql\Predicate\PredicateSet::OP_OR),
 
-        if ($data['parentId'] != 0) {
-            $select->where(new \Zend\Db\Sql\Predicate\Expression(
-                'EXISTS (SELECT 1 FROM lms_contents WHERE id = ? AND course_id = lc.id)',
-                [$data['parentId']]
-            ));
-        }
+                'lc.course_id' => $data['courseId'],
 
+                new \Zend\Db\Sql\Predicate\Expression(
+                    'EXISTS (SELECT 1 FROM lms_courses WHERE id = ?)',
+                    [$data['courseId']]
+                )
+            ])
+            ->limit(1);
         return $this->contentForm ?: ($this->contentForm = new ContentFormModel(null, [
             'db' => $this->dbService,
             'selectExists' => $select,
