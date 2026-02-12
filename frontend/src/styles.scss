@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@import "prismjs/themes/prism-twilight.css";
 
 :root {
   @include mat.sidenav-overrides((
@@ -41,6 +42,11 @@ body {
 img, picture, video, canvas, svg {
   display: block;
   max-width: 100%;
+}
+
+.non-clickable {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 [matIconButton].primary {
@@ -208,10 +214,62 @@ img, picture, video, canvas, svg {
     selected-state-text-color: var(--mat-sys-error-container),
     state-layer-color: var(--mat-sys-error),
   ));
+
+  @include mat.menu-overrides((
+    item-label-text-color: var(--mat-sys-error),
+    item-icon-color: var(--mat-sys-error),
+  ));
 }
 
 [matIconButton].error {
   @include mat.icon-overrides((
       color: var(--mat-sys-error)
+  ));
+}
+
+.no-shape {
+  @include mat.button-overrides((
+    filled-container-shape: 0,
+    outlined-container-shape: 0,
+    protected-container-shape: 0,
+    text-container-shape: 0,
+    tonal-container-shape: 0,
+  ));
+  @include mat.fab-overrides((
+    container-shape: 0,
+    extended-container-shape: 0,
+    small-container-shape: 0,
+  ));
+  @include mat.icon-button-overrides((
+    container-shape: 0,
+  ));
+}
+
+.primary-snackbar {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-primary),
+    supporting-text-color: var(--mat-sys-on-primary),
+    button-color: var(--mat-sys-on-primary),
+  ));
+}
+.accent-snackbar {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-tertiary),
+    supporting-text-color: var(--mat-sys-on-tertiary),
+    button-color: var(--mat-sys-on-tertiary),
+  ));
+}
+.secondary-snackbar {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-secondary),
+    supporting-text-color: var(--mat-sys-on-secondary),
+    button-color: var(--mat-sys-on-secondary),
+  ));
+}
+.error-snackbar {
+  @include mat.snack-bar-overrides((
+    container-color: var(--mat-sys-error),
+    supporting-text-color: var(--mat-sys-on-error),
+    button-color: var(--mat-sys-on-error),
   ));
 }
