@@ -14,3 +14,6 @@
     <mat-icon>exit_to_app</mat-icon>
   </button>
 </mat-toolbar>
+@if (contentState.isProcess()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}

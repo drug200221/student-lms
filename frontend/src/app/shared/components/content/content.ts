@@ -17,19 +17,43 @@ import { ContentState } from '../../states/content-state';
   ],
   selector: 'psk-content',
   standalone: true,
+  styles: `
+    mat-card-content markdown {
+      display: block;
+      width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    mat-card-content markdown pre {
+      word-break: break-all;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    mat-card {
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+  `,
   templateUrl: './content.html',
 })
 export class Content {
   public contentState = inject(ContentState);
 
-  public readonly content = computed(() => {
-    const response = this.contentState.data.value();
-    const currentId = this.contentState.id();
+  public readonly data = computed(() => {
+    const res = this.contentState.data.value();
+    return res?.result ?? null;
+  });
 
-    if (!response?.result || !currentId) {
-      return null;
-    }
+  public readonly safeTitle = computed(() => {
+    return  this.data()?.title;
+  });
 
-    return response.result ?? null;
+  public readonly safeContent = computed(() => {
+    return this.data()?.content;
   });
 }

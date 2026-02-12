@@ -1,8 +1,11 @@
 <mat-card>
-  @if (content(); as data) {
+  @if (data(); as data) {
     <mat-card-header>
       <mat-card-title>
-        <h2>{{ data.title }}</h2>
+        <markdown
+          [data]="'<h2>' + safeTitle() + '</h2>'"
+          emoji>
+        </markdown>
       </mat-card-title>
     </mat-card-header>
 
@@ -10,7 +13,7 @@
 
     <mat-card-content>
       <markdown
-        [data]="data.content"
+        [data]="safeContent()"
         clipboard
         emoji>
       </markdown>

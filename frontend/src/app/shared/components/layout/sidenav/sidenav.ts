@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, inject } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -8,6 +8,8 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { CourseState } from '../../../states/course-state';
 import { IMenuItem } from '../layout';
 import { SidenavService } from './sidenav.service';
+import { NgClass } from '@angular/common';
+import { ContentState } from '../../../states/content-state';
 
 @Component({
   imports: [
@@ -19,25 +21,30 @@ import { SidenavService } from './sidenav.service';
     RouterOutlet,
     MatIconButton,
     MatButton,
-  ],
-  providers: [
-    CourseState,
+    NgClass,
   ],
   selector: 'psk-sidenav',
   standalone: true,
   styleUrl: './sidenav.scss',
   templateUrl: './sidenav.html',
 })
-export class Sidenav {
+export class Sidenav implements AfterViewInit {
   public sidenavService = inject(SidenavService);
   public courseState = inject(CourseState);
+  public contentState = inject(ContentState);
 
   protected dataSource = new MatTreeNestedDataSource<IMenuItem>();
 
   constructor() {
     effect(() => {
-      this.menuStructure();
+      this.dataSource.data = this.menuStructure();
     });
+  }
+
+  public ngAfterViewInit() {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   }
 
   public readonly menuStructure = computed(() => {
@@ -45,7 +52,7 @@ export class Sidenav {
 
     if (!response?.result) {
       this.dataSource.data = [];
-      return;
+      return [];
     }
 
     const course = response.result;
@@ -60,7 +67,7 @@ export class Sidenav {
 
     menu.forEach(item => this.setRoutes(item, baseRoute));
 
-    this.dataSource.data = menu;
+    return menu;
   });
 
   private setRoutes(item: IMenuItem, baseRoute: string) {

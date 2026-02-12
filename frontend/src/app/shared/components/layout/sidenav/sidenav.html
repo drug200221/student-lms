@@ -1,9 +1,9 @@
-<mat-sidenav-container>
+<mat-sidenav-container [ngClass]="contentState.isProcess() ? 'non-clickable' : ''">
   <mat-sidenav [opened]="sidenavService.isLeftOpened()" [mode]="sidenavService.leftMode()">
     <mat-tree #tree [childrenAccessor]="childrenAccessor" [dataSource]="dataSource">
       <mat-tree-node matTreeNodePadding matTreeNodePaddingIndent="1.7rem"
                      *matTreeNodeDef="let node">
-        <button class="node default-color" matButton [routerLink]="node.route">
+        <button class="node default-color no-shape" matButton [routerLink]="node.route">
           @if (node.icon) {
             <mat-icon>{{ node.icon }}</mat-icon>
           }
@@ -16,7 +16,7 @@
         <button matIconButton matTreeNodeToggle>
           <mat-icon>{{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
         </button>
-        <button class="node default-color" matButton [routerLink]="node.route">
+        <button class="node default-color no-shape" matButton [routerLink]="node.route">
           @if (node.icon) {
             <mat-icon>{{ node.icon }}</mat-icon>
           }
