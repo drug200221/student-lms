@@ -1,9 +1,7 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
-import { distinctUntilChanged, EMPTY, filter, map, Observable, startWith } from 'rxjs';
-import { IApiResponse } from '../../core/interfaces/api-response';
-import { ICourse } from '../../core/models/course';
+import { distinctUntilChanged, EMPTY, filter, map, startWith } from 'rxjs';
 import { COURSE_SERVICE_TOKEN } from '../../core/service-tokens';
 
 @Injectable({
@@ -42,12 +40,10 @@ export class CourseState {
   public readonly data = rxResource({
     params: () => this.id(),
     stream: ({ params: id }) => {
-      if (id === undefined || id === null) {
-        return EMPTY as Observable<IApiResponse<ICourse>>;
+      if (!id) {
+        return EMPTY;
       }
-
       return this.dataService.getById(id);
     },
-    defaultValue: undefined,
   });
 }
