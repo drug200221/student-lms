@@ -1,56 +1,49 @@
 import {
   Component,
-  inject,
-  Injector,
-  signal,
   ViewEncapsulation,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  inject,
+  DestroyRef,
+  Input,
+  ChangeDetectorRef, ChangeDetectionStrategy
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
-  FormControl,
   FormsModule,
-  NG_VALUE_ACCESSOR,
   NgControl
 } from '@angular/forms';
 import { MatError } from '@angular/material/input';
-import { NgxEditorModule, Editor, Toolbar } from 'ngx-editor';
-import { columnResizing, tableEditing } from 'prosemirror-tables';
-import { InsertTableMenu } from './insert-table-menu';
-import { customNgxSchema } from './ngx-editor-schema';
+import { NgxEditorModule, Editor, toDoc, toHTML } from 'ngx-editor';
+import { keymap } from 'prosemirror-keymap';
+import { columnResizing, goToNextCell, tableEditing } from 'prosemirror-tables';
+import { TableCommand } from './commands/table-command';
+import customNgxSchema from './ngx-editor-schema';
+import { miniToolbar, toolbar } from './ngx-toolbars';
 
 @Component({
-  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'psk-ngx-editor',
+  standalone: true,
   imports: [
     FormsModule,
     NgxEditorModule,
     MatError,
-    InsertTableMenu,
+    TableCommand,
   ],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: NgxEditorComponent,
-      multi: true,
-    },
-  ],
-  selector: 'psk-ngx-editor',
-  standalone: true,
-  styleUrl: './ngx-editor.scss',
   template: `
     <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" [customMenuRef]="customMenu"></ngx-editor-menu>
     <ng-template #customMenu>
-      <psk-insert-table-menu [editor]="editor"></psk-insert-table-menu>
+      <div class="NgxEditor__Seperator"></div>
+      <psk-table-command class="NgxEditor__Dropdown" [editor]="editor"></psk-table-command>
     </ng-template>
     <ngx-editor
       [editor]="editor"
-      [ngModel]="value()"
+      [attr.required]="required"
       (focusOut)="onFocus()"
-      (focusIn)="this.placeholder.set('');"
-      (ngModelChange)="onInputChange($event)"
       [class.invalid-editor]="isInvalid"
-      [placeholder]="placeholder()"
+      [placeholder]="placeholder"
     >
     </ngx-editor>
     @if (formControl?.errors?.['maxBytes'] && (formControl?.touched || formControl?.dirty)) {
@@ -60,107 +53,106 @@ import { customNgxSchema } from './ngx-editor-schema';
       <ngx-editor-menu [editor]="editor" [toolbar]="miniToolbar"></ngx-editor-menu>
     </ngx-editor-floating-menu>
   `,
+  styleUrl: './ngx-editor.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class NgxEditorComponent implements ControlValueAccessor, OnInit, OnDestroy {
-  protected readonly value = signal('');
-  protected readonly placeholder = signal('Текст');
-  protected readonly isDisabled = signal(false);
-  protected readonly isFocused = signal(false);
-
-  private readonly injector = inject(Injector);
-  private ngControl: NgControl | null = null;
+  @Input() public required = false;
+  @Input() public placeholder = 'Текст';
 
   public editor!: Editor;
-  public ngOnInit() {
-    this.editor = new Editor({
-      schema: customNgxSchema,
-      plugins: [
-        columnResizing(),
-        tableEditing(),
-      ],
-    });
+  public readonly ngControl = inject(NgControl, { self: true, optional: true });
 
-    this.ngControl = this.injector.get(NgControl, null);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
-    setTimeout(() => {
-      this.placeholderUpdate();
-    }, 50);
-  }
-  public ngOnDestroy() {
-    this.editor.destroy();
-  }
+  private pendingValue: string | Record<string, unknown> | null = null;
+  private isSelfChange = false;
 
-  public miniToolbar: Toolbar = [
-    ['bold', 'italic', 'underline', 'strike'],
-    ['code', 'blockquote'],
-    ['link'],
-    ['text_color', 'background_color'],
-    ['align_left', 'align_center', 'align_right', 'align_justify'],
-    ['format_clear'],
-  ];
+  protected readonly miniToolbar = miniToolbar;
+  protected readonly toolbar = toolbar;
 
-  public toolbar: Toolbar = [
-    ['bold', 'italic', 'underline', 'strike'],
-    ['code', 'blockquote'],
-    ['ordered_list', 'bullet_list'],
-    [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
-    ['link', 'image'],
-    ['text_color', 'background_color'],
-    ['align_left', 'align_center', 'align_right', 'align_justify'],
-    ['horizontal_rule', 'format_clear'],
-  ];
-
-  protected get isInvalid() {
-    const control = this.ngControl?.control;
-    return !!(control && control.invalid && this.isFocused());
-  }
-
-  protected get formControl(): FormControl | null {
-    return this.ngControl?.control as FormControl | null;
-  }
-
-  private onChange: (value: string) => void = () => { /* empty */ };
-  private onTouched: () => void = () => { /* empty */ };
-
-  protected onInputChange(val: string) {
-    console.log(val);
-    this.value.set(val);
-    this.onChange(val);
-  }
-
-  public writeValue(val: string) {
-    this.value.set(val || '');
-  }
-
-  public registerOnChange(fn: (value: string) => void) {
-    this.onChange = fn;
-  }
-
-  public registerOnTouched(fn: () => void) {
-    this.onTouched = fn;
-  }
-  public setDisabledState(isDisabled: boolean): void {
-    this.isDisabled.set(isDisabled);
-  }
-
-  public onFocus() {
-    this.isFocused.set(true);
-
-    if (this.value() === '<p></p>' || this.value() === '') {
-      this.placeholderUpdate();
+  constructor() {
+    if (this.ngControl) {
+      this.ngControl.valueAccessor = this;
     }
   }
 
-  private placeholderUpdate() {
-    this.placeholder.update(() => {
-      const control = this.ngControl?.control;
-      if (!control) {
-        return 'Текст';
-      }
+  public ngOnInit(): void {
+    this.editor = new Editor({
+      schema: customNgxSchema,
+      nodeViews: {},
+      plugins: [
+        columnResizing(),
+        tableEditing(),
+        keymap({
+          "Tab": goToNextCell(1),
+          "Shift-Tab": goToNextCell(-1),
+        }),
+      ],
+    });
 
-      const errors = control.validator?.({} as never);
+    this.editor.valueChanges
+      .pipe(
+        takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        if (this.isSelfChange) {
+          return;
+        }
 
-      return errors && 'required' in errors ? 'Текст*' : 'Текст';
+        this.onChange(toHTML(value, this.editor.schema));
+      });
+
+    if (this.pendingValue) {
+      this.writeValue(this.pendingValue);
+      this.pendingValue = null;
+    }
+  }
+
+  public writeValue(val: string | Record<string, unknown> | null): void {
+    if (!this.editor?.view) {
+      this.pendingValue = val;
+      return;
+    }
+
+    this.isSelfChange = true;
+    const schema = this.editor.schema;
+    const doc = typeof val === 'string' ? toDoc(val, schema) : val;
+
+    this.editor.setContent(doc || toDoc('', schema));
+
+    setTimeout(() => {
+      this.isSelfChange = false;
+      this.cdr.markForCheck();
     });
   }
+
+  public registerOnChange(fn: (value: string | Record<string, unknown>) => void): void {
+    this.onChange = fn;
+  }
+
+  public registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  public get isInvalid(): boolean {
+    const control = this.ngControl?.control;
+    return !!(control && control.invalid && (control.touched || control.dirty));
+  }
+
+  public get formControl() {
+    return this.ngControl?.control;
+  }
+
+  public onFocus(): void {
+    this.onTouched();
+    this.cdr.markForCheck();
+  }
+
+  public ngOnDestroy(): void {
+    this.editor?.destroy();
+  }
+
+  private onChange: (value: string | Record<string, unknown>) => void = () => { /* empty */ };
+  private onTouched: () => void = () => { /* empty */ };
 }

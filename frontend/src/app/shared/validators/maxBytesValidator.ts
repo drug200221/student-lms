@@ -1,6 +1,4 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { toHTML } from 'ngx-editor';
-import { customNgxSchema } from '../components/ngx-editor/ngx-editor-schema';
 
 /**
  * Максимальный размер данных в байтах для типа TEXT в MySQL.
@@ -14,12 +12,12 @@ export const MYSQL_TEXT_MAX_BYTES = 65535;
 export function maxBytesValidator(max = MYSQL_TEXT_MAX_BYTES): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const doc = control.value;
+
     if (!doc) {
       return null;
     }
 
-    const htmlString = toHTML(doc, customNgxSchema);
-    const bytes = new Blob([htmlString]).size;
+    const bytes = new Blob([doc]).size;
 
     return bytes > max ? { maxBytes: { actual: bytes, max } } : null;
   };

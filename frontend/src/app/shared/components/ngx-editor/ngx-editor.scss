@@ -12,13 +12,48 @@ psk-ngx-editor {
       padding: 0 1rem;
       overflow: auto;
 
+      .resize-cursor {
+        cursor: col-resize;
+      }
+
       .NgxEditor__Content {
-        max-height: 650px;
+        min-height: 15rem;
+        max-height: 60vh;
         padding: 1rem 0 0.25rem 0;
         word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+
+        * {
+          -webkit-user-drag: none;
+          user-select: text;
+        }
 
         .NgxEditor__Placeholder:before {
           color: var(--mat-sys-on-surface);
+        }
+
+        table {
+          border-collapse: collapse;
+          width: fit-content;
+          max-width: 100%;
+          table-layout: fixed;
+
+          th, td {
+            border: 1px solid var(--mat-sys-outline);
+            word-break: break-word;
+          }
+        }
+
+        img {
+          max-width: 100%;
+          height: auto;
+          -webkit-user-drag: auto;
+        }
+        p {
+          margin: 0;
+          padding: 0;
         }
       }
 
@@ -33,12 +68,23 @@ psk-ngx-editor {
     }
   }
 
+  ngx-editor[required="true"] {
+    .NgxEditor {
+      .NgxEditor__Content {
+        .NgxEditor__Placeholder::before {
+          content: attr(data-placeholder) " *";
+          word-spacing: -.1rem;
+        }
+      }
+    }
+  }
+
   .invalid-editor {
     .NgxEditor {
-      border: 1px solid var(--mat-sys-error);
+      border: 0.1rem solid var(--mat-sys-error);
 
       .NgxEditor__Content {
-        .NgxEditor__Placeholder:before {
+        .NgxEditor__Placeholder:before{
           color: var(--mat-sys-error);
         }
       }
@@ -69,7 +115,7 @@ psk-ngx-editor {
 
       .NgxEditor__MenuItem--IconContainer {
         .NgxEditor__Popup {
-          background-color: var(--mat-sys-surface-bright);
+          background-color: var(--mat-sys-surface-container);
           color: var(--mat-sys-on-surface);
           box-shadow: var(--mat-sys-level1);
           border-radius: var(--mat-sys-corner-extra-small);
@@ -83,7 +129,7 @@ psk-ngx-editor {
           }
 
           input {
-            background-color: var(--mat-sys-surface-container-low); // Контраст на фоне bright
+            background-color: var(--mat-sys-surface-container-low);
             color: var(--mat-sys-on-surface);
             border: 1px solid var(--mat-sys-outline);
             border-radius: var(--mat-sys-corner-extra-small);
@@ -170,7 +216,7 @@ psk-ngx-editor {
       }
 
       .NgxEditor__Dropdown--DropdownMenu {
-        background-color: var(--mat-sys-surface-bright);
+        background-color: var(--mat-sys-surface-container);
         color: var(--mat-sys-on-surface);
         box-shadow: var(--mat-sys-level1);
         border-radius: var(--mat-sys-corner-extra-small);
@@ -191,5 +237,14 @@ psk-ngx-editor {
   /* Плавающее меню (Floating Menu) */
   ngx-editor-floating-menu {
     box-shadow: var(--mat-sys-level5);
+  }
+}
+
+.mat-mdc-menu-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  .mat-mdc-menu-item {
+    min-height: 40px !important;
   }
 }
