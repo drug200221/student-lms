@@ -1,4 +1,4 @@
-import { Observable, tap, catchError, throwError, Subject } from 'rxjs';
+import { Observable, tap, catchError, throwError, Subject, map } from 'rxjs';
 import { IApiResponse } from '../../interfaces/api-response';
 import { AbstractReadOnlyService } from './AbstractReadOnlyService';
 
@@ -25,7 +25,7 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
       this.upsertItem(payload as T);
     }
 
-    return this.http.post<IApiResponse<T>>(this.fullUrl, payload).pipe(
+    return this.http.post<IApiResponse<T>>(`${this.fullUrl}/`, payload).pipe(
       tap(res => {
         if (res.success && res.result) {
           this.upsertItem(res.result);
@@ -47,7 +47,18 @@ export abstract class AbstractCrudService<T extends { id?: string | number }> ex
       }
     }
 
-    return this.http.put<IApiResponse<T>>(url, changes, { responseType: 'text' as 'json' }).pipe(
+    return this.http.put<IApiResponse<T> | string>(url, changes, { responseType: 'text' as 'json' }).pipe(
+      map(res => {
+        try {
+          return typeof res === 'string' ? JSON.parse(res) : res;
+        } catch (e) {
+          const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+          return {
+            success: false,
+            message: `Ошибка парсинга: ${errorMessage}`,
+          };
+        }
+      }),
       tap(res => {
         if (res.success && res.result) {
           this.upsertItem(res.result);
