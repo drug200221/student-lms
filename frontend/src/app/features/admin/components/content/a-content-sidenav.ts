@@ -22,7 +22,7 @@ import { ContentState } from '../../../../shared/states/content-state';
   standalone: true,
   styles: ``,
   template: `
-    <mat-card style="height: fit-content">
+    <mat-card style="height: fit-content; margin: 0 .5rem;">
       <mat-card-actions style="flex-direction: column; gap: 0.5rem">
         <section style="display: flex; justify-content: space-around; width: 100%">
           <button class="primary" matIconButton routerLink="edit">
@@ -32,11 +32,11 @@ import { ContentState } from '../../../../shared/states/content-state';
             <mat-icon>delete</mat-icon>
           </button>
         </section>
-        <button [queryParams]="{ parentId: content()?.parentId }" matButton routerLink="../">
+        <button [queryParams]="{ parentId: content()?.parentId }" matButton routerLink="../add">
           <mat-icon>add</mat-icon>
           Соседний раздел
         </button>
-        <button [queryParams]="{ parentId: content()?.id }" matButton routerLink="../">
+        <button [queryParams]="{ parentId: content()?.id }" matButton routerLink="../add">
           <mat-icon>add</mat-icon>
           Подраздел
         </button>

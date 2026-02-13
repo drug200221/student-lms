@@ -1,8 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
-import { distinctUntilChanged, EMPTY, filter, map, Observable, startWith, tap, throwError } from 'rxjs';
-import { IApiResponse } from '../../core/interfaces/api-response';
+import { distinctUntilChanged, EMPTY, filter, map, startWith, tap, throwError } from 'rxjs';
 import { IContent, ICourseContent } from '../../core/models/content';
 import { CONTENT_SERVICE_TOKEN } from '../../core/service-tokens';
 import { ContentsService } from '../../features/admin/services/contents.service';
@@ -52,7 +51,7 @@ export class ContentState {
     },
   });
 
-  public save(changes: Partial<IContent>): Observable<IApiResponse<IContent>> {
+  public save(changes: Partial<IContent>) {
     const service = this._dataService as ContentsService;
     const currentId = this.id();
 
@@ -128,7 +127,7 @@ export class ContentState {
     );
   }
 
-  public delete(): Observable<IApiResponse<void>> {
+  public delete() {
     const service = this._dataService;
     const currentId = this.id();
 

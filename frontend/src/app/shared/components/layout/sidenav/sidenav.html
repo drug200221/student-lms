@@ -38,7 +38,7 @@
     @if (hasRightContent()) {
       <div class="sticky-wrapper">
         <button matMiniFab
-                class="right-toggle-btn"
+                class="right-toggle-btn secondary"
                 (click)="sidenavService.toggleRight()">
           <mat-icon>{{ sidenavService.isRightOpened() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
         </button>
