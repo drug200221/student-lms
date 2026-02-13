@@ -5,7 +5,7 @@ import { distinctUntilChanged, EMPTY, filter, map, Observable, startWith, tap, t
 import { IApiResponse } from '../../core/interfaces/api-response';
 import { IContent, ICourseContent } from '../../core/models/content';
 import { CONTENT_SERVICE_TOKEN } from '../../core/service-tokens';
-import { ContentService } from '../../features/admin/services/content.service';
+import { ContentsService } from '../../features/admin/services/contents.service';
 import { CourseState } from './course-state';
 
 @Injectable({
@@ -53,7 +53,7 @@ export class ContentState {
   });
 
   public save(changes: Partial<IContent>): Observable<IApiResponse<IContent>> {
-    const service = this._dataService as ContentService;
+    const service = this._dataService as ContentsService;
     const currentId = this.id();
 
     const request = currentId
@@ -67,7 +67,6 @@ export class ContentState {
         }
 
         const updatedContent = res.result;
-
         this.data.reload();
 
         this._courseState.data.update(current => {
@@ -78,31 +77,38 @@ export class ContentState {
           const contents = JSON.parse(JSON.stringify(current.result.contents));
 
           const upsertRecursive = (items: ICourseContent[]): boolean => {
-            const index = items.findIndex(item => item.id === updatedContent.id);
-            if (index > -1) {
-              items[index] = { ...items[index], ...updatedContent };
-              return true;
-            }
+            const index = items.findIndex(item => String(item.id) === String(updatedContent.id));
 
-            const parent = items.find(item => item.id === updatedContent.parentId);
-            if (parent) {
-              if (!parent.children) {
-                parent.children = [];
-              }
-              if (!parent.children.some(c => c.id === updatedContent.id)) {
-                parent.children.push({ ...updatedContent, children: [] });
-                parent.children.sort((a, b) => a.treeOrder - b.treeOrder);
-              }
+            if (index > -1) {
+              items[index] = {
+                ...items[index],
+                ...updatedContent,
+                children: items[index].children || [],
+              };
+              items.sort((a: ICourseContent, b: ICourseContent) => (a.treeOrder ?? 0) - (b.treeOrder ?? 0));
               return true;
             }
 
             for (const item of items) {
-              if (item.children && item.children.length > 0) {
+              if (item.children?.length) {
                 if (upsertRecursive(item.children)) {
                   return true;
                 }
               }
             }
+
+            const parent = items.find(item => String(item.id) === String(updatedContent.parentId));
+            if (parent) {
+              if (!parent.children) {
+                parent.children = [];
+              }
+              if (!parent.children.some(c => String(c.id) === String(updatedContent.id))) {
+                parent.children.push({ ...updatedContent, children: [] });
+                parent.children.sort((a: ICourseContent, b: ICourseContent) => (a.treeOrder ?? 0) - (b.treeOrder ?? 0));
+              }
+              return true;
+            }
+
             return false;
           };
 
@@ -110,7 +116,7 @@ export class ContentState {
 
           if (!processed && !updatedContent.parentId) {
             contents.push({ ...updatedContent, children: [] });
-            contents.sort((a: { treeOrder: number; }, b: { treeOrder: number; }) => a.treeOrder - b.treeOrder);
+            contents.sort((a: ICourseContent, b: ICourseContent) => (a.treeOrder ?? 0) - (b.treeOrder ?? 0));
           }
 
           return {
@@ -131,7 +137,7 @@ export class ContentState {
     }
 
     if ('delete' in service && typeof service.delete === 'function') {
-      return (service as ContentService).delete(currentId, true).pipe(
+      return (service as ContentsService).delete(currentId, true).pipe(
         tap(() => {
           this.data.reload();
           this._courseState.data.reload();

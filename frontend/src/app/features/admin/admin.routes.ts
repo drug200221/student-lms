@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AddContent } from './components/content/add-content';
-import { AContent } from './components/content/index/a-content';
+import { AContent } from './components/content/a-content';
 import { EditContent } from './components/content/edit-content';
 import { Test } from './components/test/test';
 

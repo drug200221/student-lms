@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, computed, effect, inject } from '@angular/core';
-import { MatButton, MatIconButton } from '@angular/material/button';
+import { AfterViewInit, Component, computed, effect, inject, ViewEncapsulation } from '@angular/core';
+import { MatButton, MatIconButton, MatMiniFabButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -10,8 +10,11 @@ import { IMenuItem } from '../layout';
 import { SidenavService } from './sidenav.service';
 import { NgClass } from '@angular/common';
 import { ContentState } from '../../../states/content-state';
+import { PortalModule } from '@angular/cdk/portal';
+import { PortalService } from '../../../../core/portals/portal.service';
 
 @Component({
+  encapsulation: ViewEncapsulation.None,
   imports: [
     MatSidenavModule,
     MatTreeModule,
@@ -22,6 +25,8 @@ import { ContentState } from '../../../states/content-state';
     MatIconButton,
     MatButton,
     NgClass,
+    MatMiniFabButton,
+    PortalModule,
   ],
   selector: 'psk-sidenav',
   standalone: true,
@@ -30,8 +35,11 @@ import { ContentState } from '../../../states/content-state';
 })
 export class Sidenav implements AfterViewInit {
   public sidenavService = inject(SidenavService);
+  public portalService = inject(PortalService);
   public courseState = inject(CourseState);
   public contentState = inject(ContentState);
+
+  public hasRightContent = computed(() => !!this.portalService.activePortal());
 
   protected dataSource = new MatTreeNestedDataSource<IMenuItem>();
 

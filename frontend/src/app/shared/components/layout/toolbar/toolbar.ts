@@ -16,7 +16,12 @@ import { ContentState } from '../../../states/content-state';
   ],
   selector: 'psk-toolbar',
   standalone: true,
-  styles: ``,
+  styles: `
+    .title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  `,
   templateUrl: './toolbar.html',
 })
 export class Toolbar {

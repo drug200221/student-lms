@@ -25,7 +25,25 @@
       </mat-tree-node>
     </mat-tree>
   </mat-sidenav>
+
+  @if(hasRightContent()) {
+  <mat-sidenav position="end"
+               [mode]="sidenavService.rightMode()"
+               [opened]="sidenavService.isRightOpened()"
+               style="max-width: 24rem">
+    <ng-template [cdkPortalOutlet]="portalService.activePortal()"></ng-template>
+  </mat-sidenav>
+  }
   <mat-sidenav-content>
+    @if (hasRightContent()) {
+      <div class="sticky-wrapper">
+        <button matMiniFab
+                class="right-toggle-btn"
+                (click)="sidenavService.toggleRight()">
+          <mat-icon>{{ sidenavService.isRightOpened() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+        </button>
+      </div>
+    }
     <router-outlet />
   </mat-sidenav-content>
 </mat-sidenav-container>

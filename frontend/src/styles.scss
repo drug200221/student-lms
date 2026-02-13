@@ -98,7 +98,7 @@ img, picture, video, canvas, svg {
 
     protected-label-text-color: var(--mat-sys-tertiary),
     protected-state-layer-color: var(--mat-sys-tertiary),
-    protected-container-color: var(--mat-sys-tertiary),
+    protected-container-color: var(--mat-sys-tertiary-container),
 
     tonal-label-text-color: var(--mat-sys-on-tertiary-container),
     tonal-container-color: var(--mat-sys-tertiary-container),
@@ -113,12 +113,12 @@ img, picture, video, canvas, svg {
 
   @include mat.fab-overrides((
     container-color: var(--mat-sys-tertiary-container),
-    foreground-color: var(--mat-sys-tertiary-container),
-    state-layer-color: var(--mat-sys-tertiary-container),
+    foreground-color: var(--mat-sys-on-tertiary-container),
+    state-layer-color: var(--mat-sys-tertiary),
 
     small-container-color: var(--mat-sys-tertiary-container),
-    small-foreground-color: var(--mat-sys-tertiary-container),
-    small-state-layer-color: var(--mat-sys-tertiary-container),
+    small-foreground-color: var(--mat-sys-on-tertiary-container),
+    small-state-layer-color: var(--mat-sys-tertiary),
   ));
 
   @include mat.button-toggle-overrides((
@@ -157,12 +157,12 @@ img, picture, video, canvas, svg {
 
   @include mat.fab-overrides((
     container-color: var(--mat-sys-secondary-container),
-    foreground-color: var(--mat-sys-secondary-container),
-    state-layer-color: var(--mat-sys-secondary-container),
+    foreground-color: var(--mat-sys-on-secondary-container),
+    state-layer-color: var(--mat-sys-secondary),
 
     small-container-color: var(--mat-sys-secondary-container),
-    small-foreground-color: var(--mat-sys-secondary-container),
-    small-state-layer-color: var(--mat-sys-secondary-container),
+    small-foreground-color: var(--mat-sys-on-secondary-container),
+    small-state-layer-color: var(--mat-sys-secondary),
   ));
 
   @include mat.button-toggle-overrides((
@@ -201,12 +201,12 @@ img, picture, video, canvas, svg {
 
   @include mat.fab-overrides((
     container-color: var(--mat-sys-error-container),
-    foreground-color: var(--mat-sys-error),
-    state-layer-color: var(--mat-sys-on-error-container),
+    foreground-color: var(--mat-sys-on-error-container),
+    state-layer-color: var(--mat-sys-error),
 
     small-container-color: var(--mat-sys-error-container),
-    small-foreground-color: var(--mat-sys-error),
-    small-state-layer-color: var(--mat-sys-on-error-container),
+    small-foreground-color: var(--mat-sys-on-error-container),
+    small-state-layer-color: var(--mat-sys-error),
   ));
 
   @include mat.button-toggle-overrides((

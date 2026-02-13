@@ -1,17 +1,26 @@
 mat-sidenav-container {
-  height: 100%;
+  height: calc(100vh - 4rem);
   margin: 0 auto;
 
   mat-sidenav {
-    width: fit-content;
-    max-width: 24rem;
+    min-width: 0;
+    width: fit-content !important;
+    max-width: 24rem !important;
     height: 100%;
-
+    position: relative;
     mat-tree {
       mat-tree-node {
+        overflow: hidden;
+
         .node {
-          flex-grow: 1;
           justify-content: flex-start;
+          overflow: hidden;
+
+          span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         }
       }
     }
@@ -20,5 +29,20 @@ mat-sidenav-container {
   mat-sidenav-content {
     height: 100%;
     padding: 0 1rem 1rem;
+
+    .sticky-wrapper {
+      position: sticky;
+      top: 20%;
+      height: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: flex-end;
+      margin-right: -0.7rem;
+    }
+
+    .right-toggle-btn {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
   }
 }

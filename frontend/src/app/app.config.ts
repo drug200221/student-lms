@@ -11,9 +11,9 @@ import { CLIPBOARD_OPTIONS, ClipboardButtonComponent, provideMarkdown } from 'ng
 import { routes } from './app.routes';
 import { CONTENT_SERVICE_TOKEN, COURSE_SERVICE_TOKEN } from './core/service-tokens';
 import { AuthService } from './core/services/auth.service';
-import { CourseService as AdminCourseService } from './features/admin/services/course.service';
+import { CoursesService as AdminCourseService } from './features/admin/services/courses.service';
 import { CourseService as UserCourseService } from './features/user/services/course.service';
-import { ContentService as AdminContentService } from './features/admin/services/content.service';
+import { ContentsService as AdminContentService } from './features/admin/services/contents.service';
 import { ContentService as UserContentService } from './features/user/services/content.service';
 
 export const appConfig: ApplicationConfig = {

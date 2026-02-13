@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AbstractCrudService } from '../../../core/abstract/services/AbstractCrudService';
-import { ICourse } from '../../../core/models/course';
+import { IContent } from '../../../core/models/content';
 
 @Injectable({
   providedIn: 'root',
 })
-export class CourseService extends AbstractCrudService<ICourse> {
+export class ContentsService extends AbstractCrudService<IContent> {
   public override get route(): string {
-    return '/admin/courses';
+    return '/admin/courses/contents';
   }
 }

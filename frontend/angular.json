@@ -17,6 +17,9 @@
         },
         "@schematics/angular:service": {
           "type": "service"
+        },
+        "@schematics/angular:directive": {
+          "type": "directive"
         }
       },
       "root": "",
@@ -32,7 +35,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
+              }
             ],
             "styles": [
               "src/styles.scss"
