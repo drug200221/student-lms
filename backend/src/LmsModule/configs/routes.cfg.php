@@ -61,6 +61,21 @@ return [
 			],
 		],
 	],
+	'lms.Admin.Courses.Tests.Attempts.REST' => [
+		'type' => 'segment',
+		'options' => [
+			'route' => '/lms/api/v1/admin/courses/tests/attempts[/[:id]]',
+			'constraints' => [],
+			'defaults' => [
+				'id' => null,
+				'_action' => 'endpointAction',
+				'_actionName' => 'endpoint',
+				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Tests\AttemptController::class,
+				'_controllerDir' => 'r-e-s-t/admin/tests/attempt',
+				'_moduleName' => 'LmsModule',
+			],
+		],
+	],
 	'lms.Admin.Courses.Tests.Questions.REST' => [
 		'type' => 'segment',
 		'options' => [
@@ -79,14 +94,14 @@ return [
 	'lms.Admin.Courses.TestCategories.REST' => [
 		'type' => 'segment',
 		'options' => [
-			'route' => '/lms/api/v1/admin/courses/test-categories[/[:id]]',
+			'route' => '/lms/api/v1/admin/courses/categories[/[:id]]',
 			'constraints' => [],
 			'defaults' => [
 				'id' => null,
 				'_action' => 'endpointAction',
 				'_actionName' => 'endpoint',
 				'_controller' => Psk\LmsModule\Controllers\REST\Admin\Tests\TestCategoryController::class,
-				'_controllerDir' => 'r-e-s-t/admin/tests/test-category',
+				'_controllerDir' => 'r-e-s-t/admin/tests/categories',
 				'_moduleName' => 'LmsModule',
 			],
 		],
@@ -139,14 +154,14 @@ return [
 	'lms.Courses.TestCategories.REST' => [
 		'type' => 'segment',
 		'options' => [
-			'route' => '/lms/api/v1/courses/test-categories[/[:id]]',
+			'route' => '/lms/api/v1/courses/categories[/[:id]]',
 			'constraints' => [],
 			'defaults' => [
 				'id' => null,
 				'_action' => 'endpointAction',
 				'_actionName' => 'endpoint',
 				'_controller' => Psk\LmsModule\Controllers\REST\User\Tests\TestCategoryController::class,
-				'_controllerDir' => 'r-e-s-t/user/tests/test-category',
+				'_controllerDir' => 'r-e-s-t/user/tests/categories',
 				'_moduleName' => 'LmsModule',
 			],
 		],

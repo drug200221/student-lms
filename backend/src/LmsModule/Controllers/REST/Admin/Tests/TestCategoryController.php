@@ -12,7 +12,7 @@ use Psk\RestModule\AbstractRestController;
 /**
  * @internal
  * TODO: ДОБАВИТЬ ПРОВЕРКУ ПРАВ И АВТОРИЗАЦИИ
- * @Route("/lms/api/v1/admin/courses/test-categories", name="lms.Admin.Courses.TestCategories")
+ * @Route("/lms/api/v1/admin/courses/categories", name="lms.Admin.Courses.TestCategories")
  */
 final class TestCategoryController extends AbstractRestController
 {

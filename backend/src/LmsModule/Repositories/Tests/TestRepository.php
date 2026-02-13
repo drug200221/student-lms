@@ -45,6 +45,22 @@ final class TestRepository implements ShareServiceInterface
     }
 
     /**
+     * @param positive-int[] $testIds
+     * @return array
+     */
+    public function findByIds(array $testIds): array
+    {
+        if (empty($testIds)) {
+            return [];
+        }
+
+        $conditions = new TestConditions();
+        $conditions->getId()->in($testIds);
+
+        return $this->testMapper->findBy($conditions);
+    }
+
+    /**
      * @param positive-int $courseId
      * @return TestModel[]
      */
