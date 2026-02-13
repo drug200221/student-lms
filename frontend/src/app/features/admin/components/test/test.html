@@ -1,11 +1,23 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Заголовок</mat-card-title>
-    <mat-card-subtitle>Подзаголовок</mat-card-subtitle>
-  </mat-card-header>
-  <mat-card-content>
-    <p>
-      Это пример контента, размещенного на подложке. Вы можете добавлять сюда любые компоненты или текст.
-    </p>
-  </mat-card-content>
-</mat-card>
+<div class="control">
+  <button class="secondary" matFab extended routerLink="categories">
+    <mat-icon>settings</mat-icon>
+    Категории
+  </button>
+  <button class="secondary" matFab extended routerLink="edit">
+    <mat-icon>settings</mat-icon>
+    Вопросы
+  </button>
+  <span style="flex: 1"></span>
+  <button matFab extended>
+    <mat-icon>add</mat-icon>
+    Создать тест
+  </button>
+</div>
+<br>
+<div class="content">
+  <psk-card-test></psk-card-test>
+  <psk-card-test></psk-card-test>
+  <psk-card-test></psk-card-test>
+  <psk-card-test></psk-card-test>
+  <psk-card-test></psk-card-test>
+</div>

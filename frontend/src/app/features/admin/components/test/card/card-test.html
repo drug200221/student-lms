@@ -1,0 +1,31 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ test.name }}</mat-card-title>
+  </mat-card-header>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <p><strong>Дата:</strong> {{ test.startDate }} - {{ test.endDate }}</p>
+    <p><strong>Попыток:</strong> {{ test.attempts }}</p>
+    <p style="display:flex; align-items: center; gap: .4rem"><mat-icon>access_time</mat-icon> {{ test.duration }}</p>
+    <p><strong>Вопросов:</strong> {{ test.questionCount }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button matIconButton title="Посмотреть">
+      <mat-icon>visibility</mat-icon>
+    </button>
+    <button class="secondary" [matMenuTriggerFor]="menu" matIconButton>
+      <mat-icon>settings</mat-icon>
+    </button>
+    <button class="accent" matIconButton title="Закрыть">
+      <mat-icon>close</mat-icon>
+    </button>
+    <button class="error" matIconButton title="Удалить">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>Конфигурация</button>
+  <button mat-menu-item>Вопросы</button>
+</mat-menu>

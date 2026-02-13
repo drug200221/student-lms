@@ -16,8 +16,8 @@ export abstract class AbstractReadOnlyService<T> {
     return `${environment.ROOT_BACKEND_URL}${environment.BASE_API_ROUTE}${this.route}`;
   }
 
-  public loadAll(): Observable<IApiResponse<T[]>> {
-    return this.http.get<IApiResponse<T[]>>(this.fullUrl).pipe(
+  public loadAll(params: string): Observable<IApiResponse<T[]>> {
+    return this.http.get<IApiResponse<T[]>>(`${this.fullUrl}?${params}`).pipe(
       tap((res) => {
         if (res.success && res.result) {
           this._data.set(res.result);
